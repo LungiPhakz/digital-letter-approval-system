@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
     }
 
     // Auto-create admin (runs every deployment safely)
-    if (User::where('email', 'admin@system.com')->doesntExist()) {
+    if (User::where('email', 'lungiphakz12@gmail.com')->doesntExist()) {
         User::create([
             
             'name' => 'Bongiwe Phakathi',
