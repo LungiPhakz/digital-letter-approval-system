@@ -20,6 +20,13 @@ WORKDIR /app
 # Copy project
 COPY . .
 
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-configure gd \
+    && docker-php-ext-install gd
+
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
 
