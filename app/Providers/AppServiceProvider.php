@@ -23,19 +23,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
          // Force HTTPS (you already added this)
-    if (env('APP_ENV') === 'production') {
-        \Illuminate\Support\Facades\URL::forceScheme('https');
-    }
+   
 
-    // Auto-create admin (runs every deployment safely)
-    if (User::where('email', 'lungiphakz12@gmail.com')->doesntExist()) {
-        User::create([
-            
-            'name' => 'Bongiwe Phakathi',
-            'email' => 'lungiphakz12@gmail.com',
-            'password' => Hash::make('Bongi@1997'),
-            'role' => 'councilor', // if your system has roles
-        ]);
-    }
+    
     }
 }
