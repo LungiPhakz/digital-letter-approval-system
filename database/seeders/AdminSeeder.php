@@ -20,7 +20,7 @@ class AdminSeeder extends Seeder
             [
                 'name' => 'Bongiwe Phakathi',
                 'password' => Hash::make('password123'),
-                'role' => 'councillor'
+                'role' => 'councilor'
             ]
         );
     }
