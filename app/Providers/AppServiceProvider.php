@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,23 +22,34 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
-         // Force HTTPS (you already added this)
-   if (env('APP_ENV') === 'production') {
-            URL::forceScheme('https');
+{
+    // ✅ Force HTTPS in production (Render)
+    if (app()->environment('production')) {
+        URL::forceScheme('https');
+    }
+
+    // ✅ Run migrations & seed (safe for Render free plan)
+    if (app()->environment('production')) {
+        try {
+            Artisan::call('migrate', ['--force' => true]);
+            Artisan::call('db:seed', ['--force' => true]);
+        } catch (\Exception $e) {
+            // Prevent app crash if DB not ready yet
         }
-
-
-         // Create admin user
-    if (!User::where('email', 'lungiphakz12@gmail.com')->exists()) {
-        User::create([
-            'name' => 'Bongiwe Phakathi',
-            'email' => 'lungiphakz12@gmail.com',
-            'password' => Hash::make('password123'),
-            'role' => 'admin' // ✅ FIXED
-        ]);
     }
 
-    
+    // ✅ Create admin user if not exists
+    try {
+        if (!User::where('email', 'lungiphakz12@gmail.com')->exists()) {
+            User::create([
+                'name' => 'Bongiwe Phakathi',
+                'email' => 'lungiphakz12@gmail.com',
+                'password' => Hash::make('password123'),
+                'role' => 'councilor', // ✅ correct role
+            ]);
+        }
+    } catch (\Exception $e) {
+        // Prevent crash if DB not ready yet
     }
+}
 }
