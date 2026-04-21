@@ -28,7 +28,15 @@ class AppServiceProvider extends ServiceProvider
         }
 
 
-       
+         // Create admin user
+    if (!User::where('email', 'lungiphakz12@gmail.com')->exists()) {
+        User::create([
+            'name' => 'Bongiwe Phakathi',
+            'email' => 'lungiphakz12@gmail.com',
+            'password' => Hash::make('password123'),
+            'role' => 'admin' // ✅ FIXED
+        ]);
+    }
 
     
     }
