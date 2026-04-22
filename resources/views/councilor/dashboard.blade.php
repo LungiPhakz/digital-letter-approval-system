@@ -13,6 +13,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
+  
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
         /* Custom Dashboard Styles */
@@ -24,6 +25,7 @@
       height: 100%;
       margin: 0;
       padding: 0;
+      overflow-x: hidden;
     }
 
     body {
@@ -295,6 +297,29 @@
       height: 300px;
       margin-bottom: 30px;
     }
+
+    @media (max-width: 640px) {
+  .card-modern {
+    border-radius: 12px;
+    padding: 16px !important;
+  }
+
+  h1 {
+    font-size: 1.5rem !important;
+  }
+
+  h2 {
+    font-size: 1.25rem !important;
+  }
+
+  h3 {
+    font-size: 1.1rem !important;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+}
     </style>
 </head>
 <body>
@@ -321,18 +346,25 @@ if ($completed->count() > 0) {
 
     <!-- Header -->
     <div class="w-full gradient-primary text-white py-6 shadow-lg">
-        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-3xl font-bold">📊 Councilor Dashboard</h1>
-                <p class="opacity-90 mt-1">Request Management System</p>
-            </div>
-            <button onclick="handleCouncilorLogout()" class="px-6 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100 transition">
-                Logout
-            </button>
-        </div>
+       <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+
+    <div>
+        <h1 class="text-3xl font-bold">📊 Councilor Dashboard</h1>
+        <p class="opacity-90 mt-1">Request Management System</p>
+    </div>
+
+    <!-- RIGHT SIDE WRAPPER -->
+    <div class="flex justify-end md:justify-end w-full md:w-auto">
+        <button onclick="handleCouncilorLogout()"
+            class="px-6 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100 transition">
+            Logout
+        </button>
+    </div>
+
+</div>
 
         <!-- Navigation Tabs -->
-        <div class="max-w-7xl mx-auto px-6 flex gap-4 border-t border-purple-400 pt-4">
+        <div class="max-w-7xl mx-auto px-4 flex flex-wrap gap-2 border-t border-purple-400 pt-4 overflow-x-auto">
             <button onclick="switchCouncilorTab('dashboard')" id="tab-dashboard" class="px-6 py-2 border-b-2 border-white font-semibold hover:opacity-80 transition">Dashboard</button>
             <button onclick="switchCouncilorTab('requests')" id="tab-requests" class="px-6 py-2 border-b-2 border-transparent font-semibold hover:opacity-80 transition">Requests</button>
             <button onclick="generateReport(), switchCouncilorTab('reports')" id="tab-reports" class="px-6 py-2 border-b-2 border-transparent font-semibold hover:opacity-80 transition">Reports</button>
@@ -343,7 +375,7 @@ if ($completed->count() > 0) {
     <!-- DASHBOARD TAB -->
     <div id="dashboard-tab" class="max-w-7xl mx-auto px-6 py-12">
         <!-- Statistics Cards -->
-        <div class="grid md:grid-cols-4 gap-6 mb-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="stat-card stat-card-purple">
                 <div class="text-4xl mb-2">📋</div>
                 <p class="opacity-75 text-sm text-gray-600">Total Requests</p>
@@ -375,7 +407,7 @@ if ($completed->count() > 0) {
                 </div>
             </div>
             <div class="card-modern p-6 shadow-lg">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Letter Types</h3>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Purpose Types</h3>
                 <div class="chart-container">
                     <canvas id="typesChart"></canvas>
                 </div>
@@ -403,13 +435,16 @@ if ($completed->count() > 0) {
         <input type="date" name="to_date" class="p-2 border rounded" value="{{ request('to_date') }}" />
 
                 <div class="flex gap-2">
-            <button class="flex-1 px-6 py-2 gradient-primary text-white rounded-lg font-semibold">
-                Apply
-            </button>
+            <button onclick="applyFilters()" class="flex-1 px-6 py-2 gradient-primary text-white rounded-lg font-semibold">
+    Apply
+</button>
 
-            <a href="{{ route('councilor.dashboard') }}" class="flex-1 px-6 py-2 bg-gray-300 text-center rounded-lg font-semibold">
-                Reset
-            </a>
+            <button type="button"
+        onclick="resetFilters()"
+        class="flex-1 px-6 py-2 bg-gray-300 text-center rounded-lg font-semibold">
+    Reset
+</button>
+
         </div>
             </div>
         </div>
@@ -426,7 +461,37 @@ if ($completed->count() > 0) {
                     </tr>
                 </thead>
                <tbody id="councilor-requests-list">
+    @forelse($requests as $request)
+        <tr>
+            <td class="border p-2">{{ $request->id }}</td>
+            <td class="border p-2">{{ $request->name }}</td>
+            <td class="border p-2">{{ $request->type }}</td>
 
+            <td class="border p-2">
+                <span class="status-badge">
+                    {{ $request->status }}
+                </span>
+            </td>
+
+            <td class="border p-2">
+                <form method="POST" action="{{ route('councilor.approve', $request->id) }}" class="inline">
+                    @csrf
+                    <button class="px-2 py-1 bg-green-500 text-white rounded">Approve</button>
+                </form>
+
+                <form method="POST" action="{{ route('councilor.reject', $request->id) }}" class="inline">
+                    @csrf
+                    <button class="px-2 py-1 bg-red-500 text-white rounded">Reject</button>
+                </form>
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="5" class="text-center p-4 text-gray-500">
+                No requests found
+            </td>
+        </tr>
+    @endforelse
 </tbody>
             </table>
         </div>
@@ -451,6 +516,10 @@ if ($completed->count() > 0) {
         </div>
         <div class="flex items-end">
          <button onclick="generateReport()" class="w-full px-6 py-2 gradient-primary text-white rounded-lg font-bold hover:shadow-lg transition">Generate Report</button>
+        <button onclick="resetReportFilters()" 
+    class="w-full px-6 py-2 gradient-primary text-white rounded-lg font-bold hover:shadow-lg transition">
+    ↻ Reset
+</button>
         </div>
        </div>
       </div><!-- Report Summary -->
@@ -468,12 +537,12 @@ if ($completed->count() > 0) {
         <p class="text-3xl font-bold text-orange-600" id="report-avg-time">0 days</p>
        </div>
       </div><!-- Detailed Report Table -->
-      <div class="card-modern shadow-lg overflow-hidden">
+      <div class="card-modern shadow-lg overflow-x-auto">
        <div class="px-6 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white">
         <h3 class="text-xl font-bold">Detailed Report</h3>
        </div>
        <div class="overflow-x-auto">
-        <table class="w-full">
+         <table class="min-w-[600px] w-full table-auto border-collapse border border-gray-200">
          <thead>
           <tr class="bg-gray-100 border-b">
            <th class="px-6 py-3 text-left font-semibold text-gray-700">Letter #</th>
@@ -497,7 +566,7 @@ if ($completed->count() > 0) {
 
     </div><!-- PROFILE TAB -->
     <div id="profile-tab" class="hidden max-w-7xl mx-auto px-6 py-12">
-     <div class="grid md:grid-cols-2 gap-8">
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Profile Card -->
       <div class="card-modern p-8 shadow-lg">
        <div class="text-center mb-8">
@@ -553,7 +622,7 @@ if ($completed->count() > 0) {
 
 <!-- APPROVAL/REJECTION MODAL (COUNCILOR) -->
    <div id="approval-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
-    <div class="card-modern max-w-md w-full animate-scale-in">
+    <div class="card-modern w-full max-w-lg mx-auto animate-scale-in">
      <div class="px-6 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white flex justify-between items-center rounded-t-lg">
       <h2 class="text-2xl font-bold">Review Request</h2>
       <button onclick="closeApprovalModal()" class="text-white hover:opacity-80 text-2xl">×</button>
@@ -589,7 +658,7 @@ if ($completed->count() > 0) {
   <!-- PROFESSIONAL SIGNING INTERFACE -->
 <div id="signing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50 overflow-auto">
   
-  <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full my-8 animate-scale-in">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl mx-auto my-4 md:my-8 animate-scale-in">
 
     <!-- HEADER -->
     <div class="px-8 py-6 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white flex justify-between items-center rounded-t-2xl">
@@ -612,7 +681,7 @@ if ($completed->count() > 0) {
       </div>
 
       <!-- GRID -->
-      <div class="grid md:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
         <!-- LEFT: LETTER -->
         <div class="md:col-span-2 space-y-4">
@@ -746,10 +815,10 @@ function updateCharts() {
         }
       });
 
-      // Letter Types Chart
+      //purpose_type Chart
       const types = {};
       allRequests.forEach(r => {
-        types[r.letter_type ] = (types[r.letter_type ] || 0) + 1;
+        types[r.purpose_type ] = (types[r.purpose_type ] || 0) + 1;
       });
 
       const typesCtx = document.getElementById('typesChart');
@@ -865,7 +934,7 @@ let currentSignatureData = null;
 
      function handleCouncilorLogout() {
       currentCouncilor = null;
-      alert('Logged out successfully', 'info');
+      showToast('Logged out successfully', 'info');
       window.location.href = "{{ route('home') }}";
 
     }
@@ -967,6 +1036,10 @@ let currentSignatureData = null;
       <div class="bg-gray-50 border rounded-lg p-4">
         <p><strong>Full Name:</strong> ${request.user?.name || 'N/A'}</p>
         <p><strong>Email Address:</strong> ${request.user?.email || 'N/A'}</p>
+        <p><strong>Current Address:</strong><br>
+${request.address ? formatAddress(request.address) : 'N/A'}
+</p>
+        
         <p><strong>Letter Type:</strong> ${request.letter_type || 'N/A'}</p>
         <p><strong>Reference Number:</strong> ${request.reference_number}</p>
       </div>
@@ -1003,7 +1076,7 @@ let currentSignatureData = null;
       ` : ''}
 
       ${request.signed_letter 
-        ? `<img src="${request.signed_letter}" class="h-20 mt-2 ml-auto" />`
+        ? `<img src="${request.signed_letter}?t=${Date.now()}" class="h-20 mt-2 ml-auto" />`
         : `<div class="w-48 border-t-2 border-gray-400 mt-10"></div>`
       }
 
@@ -1020,6 +1093,16 @@ let currentSignatureData = null;
   document.getElementById('letter-preview-modal').classList.remove('hidden');
 
  
+}
+function formatAddress(address) {
+  if (!address) return 'N/A';
+
+  // Split long OpenStreetMap address into readable parts
+  return address
+    .split(',')
+    .map(part => part.trim())
+    .filter(part => part.length > 0)
+    .join('<br>');
 }
 
 function openSigningModal(requestId) {
@@ -1078,14 +1161,14 @@ function clearSignature() {
 
 function saveSignature() {
     if (!currentSignaturePad || currentSignaturePad.isEmpty()) {
-        alert("Please draw your signature first");
+       showToast("Please draw your signature first");
         return;
     }
 
     // HIGH QUALITY EXPORT
     currentSignatureData = currentSignaturePad.toDataURL("image/png");
 
-    alert("Signature saved successfully");
+    showToast("Signature saved successfully");
 
     finalizeApprovalWithSignature();
 }
@@ -1093,21 +1176,21 @@ function saveSignature() {
 async function finalizeApprovalWithSignature() {
 
     if (!currentSelectedRequest) {
-        alert("No request selected");
+       showToast("No request selected");
         return;
     }
 
     if (!currentSignaturePad || currentSignaturePad.isEmpty()) {
-        alert("Please draw your signature first");
+       showToast("Please draw your signature first");
         return;
     }
 
     const signatureData = currentSignaturePad.toDataURL("image/png");
-    const stampInput = document.getElementById('stamp-upload');
 
     const formData = new FormData();
     formData.append('signature', signatureData);
 
+    const stampInput = document.getElementById('stamp-upload');
     if (stampInput && stampInput.files.length > 0) {
         formData.append('stamp', stampInput.files[0]);
     }
@@ -1117,19 +1200,28 @@ async function finalizeApprovalWithSignature() {
             `/councilor/approve-with-signature/${currentSelectedRequest.id}`,
             {
                 method: "POST",
+                credentials: "same-origin",
                 headers: {
                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                    "X-Requested-With": "XMLHttpRequest",
                     "Accept": "application/json"
                 },
                 body: formData
             }
         );
 
-        const data = await response.json(); // ✅ directly parse JSON
+        // ❌ STOP if not OK
+        if (!response.ok) {
+            console.error("Server error:", response.status);
+           showToast("Server error: " + response.status);
+            return;
+        }
+
+        // ✅ ONLY parse once
+        const data = await response.json();
 
         if (data.success) {
 
-            // ✅ Update UI instantly
             applyApprovalUpdate({
                 id: currentSelectedRequest.id,
                 status: "Approved",
@@ -1137,25 +1229,29 @@ async function finalizeApprovalWithSignature() {
                 stamp: data.stamp
             });
 
-            alert(data.message || "Approved successfully ✅");
+           showToast("Signed successfully ✅");
 
             closeSigningModal();
-             // ✅ RELOAD LETTER WITH SIGNATURE + STAMP
-    openLetterPreviewModal(currentSelectedRequest.id);
+
+            // small delay to avoid race condition
+            setTimeout(() => {
+                openLetterPreviewModal(currentSelectedRequest.id);
+            }, 300);
 
         } else {
-            alert(data.message || "Approval failed");
+            showToast(data.message || "Approval failed");
         }
 
     } catch (error) {
-        console.error("FETCH ERROR:", error);
-        alert("Network error or server not responding");
+        // 🔥 ONLY show if REAL failure
+        console.error("REAL ERROR:", error);
+        showToast("Unexpected error occurred");
     }
 }
 
 function saveAndApprove() {
     if (!currentSignaturePad || currentSignaturePad.isEmpty()) {
-        alert("Please draw signature first");
+        showToast("Please draw signature first");
         return;
     }
   console.log("Selected Request:", currentSelectedRequest);
@@ -1342,7 +1438,9 @@ async function confirmApprove() {
 
     const response = await fetch(`/councilor/approve/${currentSelectedRequest.id}`, {
     method: 'POST',
+     credentials: "same-origin", // 🔥 ADD THIS
     headers: {
+      
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
         'Accept': 'application/json'
     }
@@ -1352,7 +1450,7 @@ async function confirmApprove() {
 
    if (data.success) {
 
-    alert('Approved successfully');
+    showToast('Approved successfully');
 
     // 🔥 UPDATE LOCAL DATA
     const index = allRequests.findIndex(r => r.id === currentSelectedRequest.id);
@@ -1404,7 +1502,7 @@ async function confirmReject() {
     const data = await response.json();
 
     if (data.success) {
-        alert('Rejected successfully');
+        showToast('Rejected successfully');
         location.reload();
     }
 }
@@ -1529,7 +1627,93 @@ function applyApprovalUpdate(updatedRequest) {
     updateCouncilorDashboard();
 }
 
+function applyFilters() {
+    const searchLetter = document.querySelector('input[name="search"]').value.toUpperCase();
+    const fromDate = document.querySelector('input[name="from_date"]').value;
+    const toDate = document.querySelector('input[name="to_date"]').value;
+
+    filteredRequests = allRequests.filter(request => {
+
+        let matches = true;
+
+        // FIXED: reference_number (not letter_number)
+        if (searchLetter) {
+            matches = matches &&
+                (request.reference_number || '')
+                .toUpperCase()
+                .includes(searchLetter);
+        }
+
+        if (fromDate) {
+            matches = matches &&
+                new Date(request.created_at) >= new Date(fromDate);
+        }
+
+        if (toDate) {
+            const toDateEnd = new Date(toDate);
+            toDateEnd.setHours(23, 59, 59, 999);
+
+            matches = matches &&
+                new Date(request.created_at) <= toDateEnd;
+        }
+
+        return matches;
+    });
+
+    renderCouncilorRequests();
+    updateCouncilorDashboard();
+
+    showToast('Filters applied', 'info');
+}
+
+function resetFilters() {
+
+    document.querySelector('input[name="search"]').value = '';
+    document.querySelector('input[name="from_date"]').value = '';
+    document.querySelector('input[name="to_date"]').value = '';
+
+    filteredRequests = [...allRequests];
+
+    renderCouncilorRequests();
+    updateCouncilorDashboard();
+
+    showToast('Filters reset', 'info');
+}
+
+function resetReportFilters() {
+    document.getElementById('report-from-date').value = '';
+    document.getElementById('report-to-date').value = '';
+
+    generateReport();
+
+    showToast('All filters cleared — showing full report', 'info');
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+
+    toast.className = `notification-toast toast-${type}`;
+    toast.textContent = message;
+
+    // Optional: prevent too many toasts stacking
+    const existingToasts = document.querySelectorAll('.notification-toast');
+    existingToasts.forEach(t => t.remove());
+
+    document.body.appendChild(toast);
+
+    // Smooth fade out before removal
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = '0.4s ease';
+    }, 2500);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
 </script>
+
+
 
 </body>
 </html>

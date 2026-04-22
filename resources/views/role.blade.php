@@ -103,6 +103,29 @@ function showRolePage() {
     document.getElementById('councilor-login-page').classList.add('hidden');
     document.getElementById('role-page').classList.remove('hidden');
 }
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+
+    toast.className = `notification-toast toast-${type}`;
+    toast.textContent = message;
+
+    // Optional: prevent too many toasts stacking
+    const existingToasts = document.querySelectorAll('.notification-toast');
+    existingToasts.forEach(t => t.remove());
+
+    document.body.appendChild(toast);
+
+    // Smooth fade out before removal
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = '0.4s ease';
+    }, 2500);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
 </script>
 
 </body>

@@ -57,11 +57,13 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/councilor/send/{id}', [CouncilorController::class, 'send'])
             ->name('councilor.send');
-    });
 
+            
      // ✅ FIXED: KEEP IT INSIDE GROUP
         Route::post('/councilor/approve-with-signature/{id}', [CouncilorController::class, 'approveWithSignature'])
             ->name('councilor.approve.signature');
+    });
+
 
     // ===== ADMIN =====
     Route::middleware('role:admin')->group(function () {

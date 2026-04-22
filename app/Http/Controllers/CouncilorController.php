@@ -11,48 +11,57 @@ class CouncilorController extends Controller
 {
     // ================= LOGIN =================
     public function login(Request $request)
-    {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required|string|min:6',
-        ]);
+{
+    $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required|string|min:6',
+    ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
+    $credentials = $request->only('email', 'password');
 
-            $user = Auth::user();
+    if (Auth::attempt($credentials)) {
 
-            if ($user->role !== 'councilor' && $user->role !== 'admin') {
-                Auth::logout();
-                return back()->with('error', 'Access denied. Not a councilor.');
-            }
+        $user = Auth::user();
 
-            return redirect()->route('councilor.dashboard');
+        // 🔒 Role check
+        if (!in_array($user->role, ['councilor', 'admin'])) {
+            Auth::logout();
+
+            return back()->with('error', 'Access denied.');
         }
 
-        return back()->with('error', 'Invalid login details');
+        return redirect()->route('councilor.dashboard');
     }
+
+    // ❌ Wrong email OR password (don’t reveal which one for security)
+    return back()->with('error', 'Invalid Login Details');
+}
 
     // ================= DASHBOARD =================
-    public function dashboard(Request $request)
-    {
-        $query = LetterRequest::query();
+   public function dashboard(Request $request)
+{
+    $query = LetterRequest::with('user');
 
-        if ($request->search) {
-            $query->where('reference_number', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->from_date) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-
-        if ($request->to_date) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $requests = $query->with('user')->latest()->get();
-
-        return view('councilor.dashboard', compact('requests'));
+    // Search by reference number OR name (safer)
+    if ($request->search) {
+        $query->where(function ($q) use ($request) {
+            $q->where('reference_number', 'like', '%' . $request->search . '%')
+              ->orWhere('name', 'like', '%' . $request->search . '%');
+        });
     }
+
+    if ($request->from_date) {
+        $query->whereDate('created_at', '>=', $request->from_date);
+    }
+
+    if ($request->to_date) {
+        $query->whereDate('created_at', '<=', $request->to_date);
+    }
+
+    $requests = $query->latest()->get();
+
+    return view('councilor.dashboard', compact('requests'));
+}
 
     // ================= APPROVE (NO SIGNATURE) =================
     public function approve($id)
@@ -83,54 +92,55 @@ class CouncilorController extends Controller
 
     // ================= APPROVE WITH SIGNATURE + STAMP =================
  // ================= APPROVE WITH SIGNATURE + STAMP =================
-    public function approveWithSignature(Request $request, $id)
+   public function approveWithSignature(Request $request, $id)
 {
-   $req = LetterRequest::findOrFail($id);
+    try {
+        $req = LetterRequest::findOrFail($id);
 
-        // ===== SAVE SIGNATURE =====
+        // ===== SIGNATURE =====
         if ($request->signature) {
 
-           $image = str_replace('data:image/png;base64,', '', $request->signature);
+            $image = str_replace('data:image/png;base64,', '', $request->signature);
             $image = str_replace(' ', '+', $image);
 
-            $imageName = 'signatures/' . uniqid() . '.png'; 
+            $imageName = 'signatures/' . uniqid() . '.png';
+
             Storage::disk('public')->put($imageName, base64_decode($image));
 
-            // Save FULL URL
-           $signaturePath = '/storage/' . $imageName; $req->signed_letter = $signaturePath;
+            // ✅ FIXED
+            $req->signed_letter = asset('storage/' . $imageName);
         }
 
-        $defaultStamp = '/images/default-stamp.png';
+        // ===== STAMP =====
+        if ($request->hasFile('stamp')) {
 
-// ===== SAVE STAMP =====
-if ($request->hasFile('stamp')) {
+            $path = $request->file('stamp')->store('stamps', 'public');
+            $req->stamp = asset('storage/' . $path);
 
-    $stampPath = $request->file('stamp')->store('stamps', 'public');
-    $req->stamp = '/storage/' . $stampPath;
-
-} else {
-
-    // fallback to default if nothing uploaded
-    $req->stamp = $req->stamp ?? $defaultStamp;
-}
-
-       
+        } else {
+            $req->stamp = asset('images/default-stamp.png');
+        }
 
         // ===== APPROVAL =====
         $req->status = 'Approved';
-         $req->approved_at = now();
-         $req->approved_by = auth()->user()->name; 
-         
-         $req->save();
+        $req->approved_at = now();
+        $req->approved_by = auth()->user()->name;
+        $req->save();
 
         return response()->json([
-    'success' => true,
-    'message' => 'Signed and approved successfully',
-    'signed_letter' => $req->signed_letter,
-    'stamp' => $req->stamp
-]);
-    } 
-    
+            'success' => true,
+            'signed_letter' => $req->signed_letter,
+            'stamp' => $req->stamp
+        ]);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
     public function send($id)
     {
         $request = LetterRequest::findOrFail($id);

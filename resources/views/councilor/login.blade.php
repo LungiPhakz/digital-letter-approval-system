@@ -118,9 +118,33 @@ Login to Dashboard
 
 </div>
 
-</div>
+@if(session('error'))
+<script>
+    showToast("{{ session('error') }}", "error");
+</script>
+@endif
 
 </div>
 
+</div>
+<script>
+<script>
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+
+    toast.className = `notification-toast toast-${type}`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = '0.4s ease';
+    }, 2500);
+
+    setTimeout(() => toast.remove(), 3000);
+}
+</script>
+</script>
 </body>
 </html>

@@ -41,6 +41,8 @@
       height: 100%;
       margin: 0;
       padding: 0;
+      overflow-x: hidden;
+      max-width: 100%;
     }
 
     body {
@@ -292,6 +294,9 @@
       height: 300px;
       margin-bottom: 30px;
     }
+    section {
+  overflow-x: hidden;
+}
   </style>
 
   <style>body { box-sizing: border-box; }</style>

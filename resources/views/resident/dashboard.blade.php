@@ -187,7 +187,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
         <select name="letter_type" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg">
           <option value="">Select a type...</option>
           <option value="Proof of Residence">Proof of Residence</option>
-          <option value="Residency Certificate">Residency Certificate</option>
+         
         </select>
       </div>
 
@@ -210,16 +210,13 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
          class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg">
 </div>
 
-      <!-- Address -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Residential Address</label>
-        <textarea 
-          name="address" 
-          required
-          placeholder="Enter full residential address"
-          class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"></textarea>
-      </div>
+     <div>
+  <label class="block text-gray-700 font-semibold mb-2">Detected Current Address</label>
 
+  <input type="text" id="auto_address" readonly
+         class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg bg-gray-100"
+         placeholder="Detecting your location..." />
+</div>
       <!-- Address Accuracy -->
       <div>
         <label class="block text-gray-700 font-semibold mb-2">Address Accuracy</label>
@@ -229,7 +226,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
           <option value="approximate">Approximate / Nearby</option>
         </select>
       </div>
-
+      <input type="hidden" name="address" id="address">
       <!-- Hidden GPS Fields -->
       <input type="hidden" name="latitude" id="latitude">
       <input type="hidden" name="longitude" id="longitude">
@@ -350,10 +347,13 @@ function goToPage(page) {
 
 // ---------------- Resident Functions ----------------
 function handleResidentLogout() {
-  currentResident = null;
-  alert('Logged out successfully'); // Replace with toast if needed
-  // Here you can redirect to role selection page
-  window.location.href = "{{ route('home') }}";
+    currentResident = null;
+
+    showToast('Logged out successfully', 'info');
+
+    setTimeout(() => {
+        window.location.href = "{{ route('home') }}";
+    }, 1200); // give toast time to show
 }
 
 function openRequestModal() {
@@ -421,7 +421,11 @@ function buildLetter(request) {
       <div class="bg-gray-50 border rounded-lg p-4">
         <p><strong>Full Name:</strong> ${request.user?.name || 'N/A'}</p>
         <p><strong>Email:</strong> ${request.user?.email || 'N/A'}</p>
-        <p><strong>Type:</strong> ${request.letter_type}</p>
+        <!-- ✅ ADD CURRENT ADDRESS HERE -->
+ <p><strong>Current Address:</strong><br>
+${request.address ? formatAddress(request.address) : 'N/A'}
+</p>
+        <p><strong>Letter SType:</strong> ${request.letter_type}</p>
         <p><strong>Reference:</strong> ${request.reference_number}</p>
       </div>
 
@@ -475,7 +479,7 @@ function buildLetter(request) {
   const element = document.getElementById('letter-export');
 
   if (!element) {
-    alert("Letter not found for export");
+    showToast("Letter not found for export");
     return;
   }
 
@@ -569,14 +573,75 @@ function formatDate(dateString) {
 // Auto capture GPS location
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(
-    function(position) {
-      document.getElementById('latitude').value = position.coords.latitude;
-      document.getElementById('longitude').value = position.coords.longitude;
+    async function(position) {
+
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      document.getElementById('latitude').value = lat;
+      document.getElementById('longitude').value = lng;
+
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        );
+
+        const data = await response.json();
+
+        const address = data.display_name || "Unknown location";
+
+        // 👇 show to user
+        document.getElementById('auto_address').value = address;
+
+        // ✅ IMPORTANT: store as STRING in hidden field
+        document.getElementById('address').value = address;
+
+      } catch (error) {
+        document.getElementById('auto_address').value = "Location detected, but address not available";
+        document.getElementById('address').value = "N/A";
+      }
+
     },
     function(error) {
-      console.log("Location permission denied or failed");
+      document.getElementById('auto_address').value = "Location access denied";
+      document.getElementById('address').value = "N/A";
     }
   );
+}
+
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+
+    toast.className = `notification-toast toast-${type}`;
+    toast.textContent = message;
+
+    // Optional: prevent too many toasts stacking
+    const existingToasts = document.querySelectorAll('.notification-toast');
+    existingToasts.forEach(t => t.remove());
+
+    document.body.appendChild(toast);
+
+    // Smooth fade out before removal
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = '0.4s ease';
+    }, 2500);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+function formatAddress(address) {
+  if (!address) return 'N/A';
+
+  // Split long OpenStreetMap address into readable parts
+  return address
+    .split(',')
+    .map(part => part.trim())
+    .filter(part => part.length > 0)
+    .join('<br>');
 }
 
 
