@@ -10,13 +10,13 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    libpq-dev
+    libpq-dev \
+    && docker-php-ext-install pdo_pgsql pgsql
 
-# Install PHP extensions
+# Install other PHP extensions
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
-    pdo_pgsql \
     zip \
     gd
 
@@ -35,5 +35,5 @@ RUN composer install --no-dev --optimize-autoloader
 # Expose port
 EXPOSE 10000
 
-# Start app (NO .env COPY!)
+# Start app
 CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan serve --host=0.0.0.0 --port=10000"]
