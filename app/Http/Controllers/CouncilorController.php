@@ -108,14 +108,14 @@ class CouncilorController extends Controller
             Storage::disk('public')->put($imageName, base64_decode($image));
 
             // ✅ FIXED
-            $req->signed_letter = asset('storage/' . $imageName);
+            $req->signed_letter = asset('storage/signatures/' . $imageName);
         }
 
         // ===== STAMP =====
         if ($request->hasFile('stamp')) {
 
             $path = $request->file('stamp')->store('stamps', 'public');
-            $req->stamp = asset('storage/' . $path);
+            $req->stamp = asset('storage/stamps/' . $path);
 
         } else {
             $req->stamp = asset('images/default-stamp.png');
