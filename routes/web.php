@@ -58,6 +58,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/councilor/send/{id}', [CouncilorController::class, 'send'])
             ->name('councilor.send');
 
+
+              Route::get('/signature/{filename}', function ($filename) {
+    $path = storage_path('app/public/signatures/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
             
      // ✅ FIXED: KEEP IT INSIDE GROUP
         Route::post('/councilor/approve-with-signature/{id}', [CouncilorController::class, 'approveWithSignature'])

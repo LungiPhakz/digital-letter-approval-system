@@ -1076,7 +1076,7 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
       ` : ''}
 
       ${request.signed_letter 
-        ? `<img src="${request.signed_letter}?t=${Date.now()}" class="h-20 mt-2 ml-auto" />`
+        ? `<img src="/signature/{{ basename($request->signed_letter) }}" class="h-20 mt-2 ml-auto" />`
         : `<div class="w-48 border-t-2 border-gray-400 mt-10"></div>`
       }
 
