@@ -96,7 +96,7 @@ class CouncilorController extends Controller
   public function approveWithSignature(Request $request, $id)
 {
     $request->validate([
-        'signature' => 'nullable|string',
+       'signature' => 'required|string',
         'stamp' => 'nullable|image|max:2048',
     ]);
 
@@ -119,16 +119,51 @@ class CouncilorController extends Controller
     ]);
 
     // ===== SIGNATURE (BASE64 → CLOUDINARY) =====
-    if ($request->signature) {
+    // ===== SIGNATURE (FIXED) =====
+if ($request->signature) {
 
-        $upload = $cloudinary->uploadApi()->upload($request->signature, [
+    try {
+        $base64 = $request->signature;
+
+        // 🔥 REMOVE PREFIX (THIS IS THE MAIN FIX)
+        if (preg_match('/^data:image\/(\w+);base64,/', $base64)) {
+            $base64 = substr($base64, strpos($base64, ',') + 1);
+        }
+
+        $base64 = base64_decode($base64);
+
+        if ($base64 === false) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid base64 signature'
+            ], 400);
+        }
+
+        // 🔥 Upload as file (Cloudinary-friendly)
+        $tempFile = tmpfile();
+        fwrite($tempFile, $base64);
+        $tempPath = stream_get_meta_data($tempFile)['uri'];
+
+        $upload = $cloudinary->uploadApi()->upload($tempPath, [
             'folder' => 'signatures'
         ]);
 
-        $letter->signed_letter = $upload['secure_url'];
-    }
+        fclose($tempFile);
 
-    // ===== STAMP =====
+        $letter->signed_letter = $upload['secure_url'];
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Signature upload failed',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+    // ===== STAMP (SAFE) =====
+try {
+
     if ($request->hasFile('stamp')) {
 
         $upload = $cloudinary->uploadApi()->upload(
@@ -141,6 +176,14 @@ class CouncilorController extends Controller
     } else {
         $letter->stamp = asset('images/default-stamp.png');
     }
+
+} catch (\Exception $e) {
+    return response()->json([
+        'success' => false,
+        'message' => 'Stamp upload failed',
+        'error' => $e->getMessage()
+    ], 500);
+}
 
     // ===== APPROVAL =====
     $letter->status = 'Approved';
