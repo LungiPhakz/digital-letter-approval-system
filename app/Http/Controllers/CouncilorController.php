@@ -100,16 +100,16 @@ class CouncilorController extends Controller
         // ===== SIGNATURE =====
         if ($request->signature) {
 
-            $image = str_replace('data:image/png;base64,', '', $request->signature);
-            $image = str_replace(' ', '+', $image);
+    $image = str_replace('data:image/png;base64,', '', $request->signature);
+    $image = str_replace(' ', '+', $image);
 
-            $imageName = 'signatures/' . uniqid() . '.png';
+    $fileName = uniqid() . '.png';
 
-            Storage::disk('public')->put($imageName, base64_decode($image));
+    Storage::disk('public')->put('signatures/' . $fileName, base64_decode($image));
 
-            // ✅ FIXED
-            $req->signed_letter = asset('signatures/' . $imageName);
-        }
+    // ✅ SAVE ONLY RELATIVE PATH
+    $req->signed_letter = 'signatures/' . $fileName;
+}
 
         // ===== STAMP =====
         if ($request->hasFile('stamp')) {
