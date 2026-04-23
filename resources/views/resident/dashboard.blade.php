@@ -442,7 +442,7 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
      <!-- STAMP (LEFT SIDE) -->
   ${request.stamp ? `
     <img 
-  src="${request.stamp}" 
+  src="/storage/${request.stamp}" 
   class="absolute left-10 bottom-0 w-32 opacity-70 rotate-[-15deg]"
   style="mix-blend-mode:multiply; filter:contrast(1.2);"
 />
@@ -456,7 +456,7 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
       <div class="text-right">
 
         ${request.signed_letter ? `
-          <img src="${request.signed_letter}" class="h-20 ml-auto mt-2" />
+          <img src="/storage/${request.signed_letter}" class="h-20 ml-auto mt-2" />
         ` : `<div class="w-48 border-t-2 border-gray-400 mt-10"></div>`}
 
         <p class="font-bold mt-2">Community Councilor</p>

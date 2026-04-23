@@ -1057,7 +1057,7 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
   <!-- STAMP (LEFT SIDE) -->
   ${request.stamp ? `
     <img 
-  src="${request.stamp}" 
+  src="/storage/${request.stamp}" 
   class="absolute left-10 bottom-0 w-32 opacity-70 rotate-[-15deg]"
   style="mix-blend-mode:multiply; filter:contrast(1.2);"
 />
@@ -1076,7 +1076,7 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
       ` : ''}
 
       ${request.signed_letter 
-        ? `<img src="${request.signed_letter}?t=${Date.now()}" class="h-20 mt-2 ml-auto" />`
+        ? `<img src="/storage/${request.signed_letter}?t=${Date.now()}" class="h-20 mt-2 ml-auto" />`
         : `<div class="w-48 border-t-2 border-gray-400 mt-10"></div>`
       }
 
