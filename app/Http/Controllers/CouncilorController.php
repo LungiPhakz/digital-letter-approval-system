@@ -107,7 +107,7 @@ class CouncilorController extends Controller
 
     Storage::disk('public')->put($fileName, base64_decode($image));
 
-    $req->signed_letter = $fileName; // NOT 'storage/...'
+    $req->signed_letter = 'storage/' . $fileName;
 }
 
         // ===== STAMP =====

@@ -448,7 +448,7 @@ if ($completed->count() > 0) {
         </div>
             </div>
         </div>
-        <div class="card-modern p-6 shadow-lg">
+        <div class="card-modern p-6 shadow-lg overflow-x-auto">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Requests Table</h3>
             <table class="w-full table-auto border-collapse border border-gray-200">
                 <thead>
@@ -1076,7 +1076,7 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
       ` : ''}
 
       ${request.signed_letter 
-        ? `<img src="/signature/{{ basename($request->signed_letter) }}" class="h-20 mt-2 ml-auto" />`
+        ? `<img src="${request.signed_letter}?t=${Date.now()}" class="h-20 mt-2 ml-auto" />`
         : `<div class="w-48 border-t-2 border-gray-400 mt-10"></div>`
       }
 
