@@ -90,11 +90,20 @@ class CouncilorController extends Controller
 
         return response()->json(['success' => true]);
     }
-
+   
     // ================= APPROVE WITH SIGNATURE + STAMP =================
  // ================= APPROVE WITH SIGNATURE + STAMP =================
   public function approveWithSignature(Request $request, $id)
 {
+
+    \Log::info('STEP 2: validation passed');
+\Log::info('STEP 3: cloudinary init done');
+\Log::info('STEP 4: before signature upload');
+\Log::info('STEP 5: after signature upload');
+\Log::info('STEP 6: before stamp upload');
+\Log::info('STEP 7: after stamp upload');
+\Log::info('STEP 8: saving letter');
+
     $request->validate([
        'signature' => 'required|string',
         'stamp' => 'nullable|image|max:2048',

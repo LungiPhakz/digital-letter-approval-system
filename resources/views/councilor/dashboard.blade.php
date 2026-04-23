@@ -1211,11 +1211,15 @@ async function finalizeApprovalWithSignature() {
         );
 
         // ❌ STOP if not OK
-        if (!response.ok) {
-            console.error("Server error:", response.status);
-           showToast("Server error: " + response.status);
-            return;
-        }
+        onst text = await response.text();
+console.log("RAW RESPONSE:", text);
+
+try {
+    const data = JSON.parse(text);
+    console.log("JSON:", data);
+} catch (e) {
+    console.error("NOT JSON:", text);
+}
 
         // ✅ ONLY parse once
         const data = await response.json();
