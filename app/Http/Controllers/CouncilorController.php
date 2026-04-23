@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\LetterRequest;
+use Cloudinary\Cloudinary;
 
 class CouncilorController extends Controller
 {
@@ -92,54 +93,77 @@ class CouncilorController extends Controller
 
     // ================= APPROVE WITH SIGNATURE + STAMP =================
  // ================= APPROVE WITH SIGNATURE + STAMP =================
-   public function approveWithSignature(Request $request, $id)
+  public function approveWithSignature(Request $request, $id)
 {
-    try {
-        $req = LetterRequest::findOrFail($id);
+    $request->validate([
+        'signature' => 'nullable|string',
+        'stamp' => 'nullable|image|max:2048',
+    ]);
 
-        // ===== SIGNATURE =====
-        if ($request->signature) {
+    $user = Auth::user();
 
-    $image = str_replace('data:image/png;base64,', '', $request->signature);
-    $image = str_replace(' ', '+', $image);
+    if (!$user) {
+        return response()->json(['error' => 'Unauthenticated'], 401);
+    }
 
-    $fileName = uniqid() . '.png';
+    $letter = LetterRequest::findOrFail($id);
 
-    Storage::disk('public')->put('signatures/' . $fileName, base64_decode($image));
+    // Cloudinary setup
+    $cloudinary = new Cloudinary([
+        'cloud' => [
+            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+            'api_key'    => env('CLOUDINARY_API_KEY'),
+            'api_secret' => env('CLOUDINARY_API_SECRET'),
+        ],
+        'url' => ['secure' => true]
+    ]);
 
-    // ✅ SAVE ONLY RELATIVE PATH
-    $req->signed_letter = 'signatures/' . $fileName;
-}
+    // ===== SIGNATURE (BASE64 → CLOUDINARY) =====
+    if ($request->signature) {
 
-        // ===== STAMP =====
-        if ($request->hasFile('stamp')) {
-
-            $path = $request->file('stamp')->store('stamps', 'public');
-            $req->stamp = $path; // ✅ just store path
-
-        } else {
-            $req->stamp = asset('images/default-stamp.png');
-        }
-
-        // ===== APPROVAL =====
-        $req->status = 'Approved';
-        $req->approved_at = now();
-        $req->approved_by = auth()->user()->name;
-        $req->save();
-
-        return response()->json([
-            'success' => true,
-            'signed_letter' => $req->signed_letter,
-            'stamp' => $req->stamp
+        $upload = $cloudinary->uploadApi()->upload($request->signature, [
+            'folder' => 'signatures'
         ]);
 
-    } catch (\Exception $e) {
-
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ], 500);
+        $letter->signed_letter = $upload['secure_url'];
     }
+
+    // ===== STAMP =====
+    if ($request->hasFile('stamp')) {
+
+        $upload = $cloudinary->uploadApi()->upload(
+            $request->file('stamp')->getRealPath(),
+            ['folder' => 'stamps']
+        );
+
+        $letter->stamp = $upload['secure_url'];
+
+    } else {
+        $letter->stamp = asset('images/default-stamp.png');
+    }
+
+    // ===== APPROVAL =====
+    $letter->status = 'Approved';
+    $letter->approved_at = now();
+    $letter->approved_by = $user->name;
+    $letter->save();
+
+    return response()->json([
+        'success' => true,
+        'signed_letter' => $letter->signed_letter,
+        'stamp' => $letter->stamp
+    ]);
+}
+
+private function cloudinary()
+{
+    return new Cloudinary([
+        'cloud' => [
+            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+            'api_key'    => env('CLOUDINARY_API_KEY'),
+            'api_secret' => env('CLOUDINARY_API_SECRET'),
+        ],
+    ]);
 }
     public function send($id)
     {
