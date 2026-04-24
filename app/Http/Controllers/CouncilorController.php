@@ -98,17 +98,22 @@ class CouncilorController extends Controller
         $req = LetterRequest::findOrFail($id);
 
         // ===== SIGNATURE =====
-       if ($request->signature) {
+   if ($request->signature) {
 
     $image = str_replace('data:image/png;base64,', '', $request->signature);
     $image = str_replace(' ', '+', $image);
 
-    $fileName = 'signatures/' . uniqid() . '.png';
+    // ✅ GENERATE UNIQUE FILE NAME
+    $fileName = 'signatures/sign_' . time() . '_' . uniqid() . '.png';
 
+    // ✅ SAVE CORRECTLY
     Storage::disk('public')->put($fileName, base64_decode($image));
 
+    // ✅ SAVE PATH
     $req->signed_letter = 'storage/' . $fileName;
-}
+} else {
+            $req->signed_letter = asset('images/default-signature.png');
+        }
 
         // ===== STAMP =====
         if ($request->hasFile('stamp')) {
@@ -116,10 +121,8 @@ class CouncilorController extends Controller
             $path = $request->file('stamp')->store('stamps', 'public');
             $req->stamp = 'storage/' . $path; // ✅ just store path
 
-        } else {
-            $req->stamp = asset('images/default-stamp.png');
-        }
-
+        } 
+        
         // ===== APPROVAL =====
         $req->status = 'Approved';
         $req->approved_at = now();

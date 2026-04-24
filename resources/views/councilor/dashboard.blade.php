@@ -1076,9 +1076,9 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
       ` : ''}
 
       ${request.signed_letter 
-        ? `<img src="${request.signed_letter}?t=${Date.now()}" class="h-20 mt-2 ml-auto" />`
-        : `<div class="w-48 border-t-2 border-gray-400 mt-10"></div>`
-      }
+    ? `<img src="${request.signed_letter}?t=${Date.now()}" class="h-20 mt-2 ml-auto" />`
+    : `<img src="/images/default-signature.png" class="h-20 mt-2 ml-auto opacity-60" />`
+}
 
       <p class="font-bold mt-2">Community Councilor</p>
       <p class="text-sm text-gray-500">${request.approved_by || ''}</p>
