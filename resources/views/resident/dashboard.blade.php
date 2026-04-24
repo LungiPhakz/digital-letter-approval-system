@@ -455,12 +455,12 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
 
       <div class="text-right">
 
-        <img 
-    src="${request.signed_letter 
-        ? request.signed_letter + '?t=' + Date.now() 
-        : '/images/default-signature.png'}" 
-    class="h-20 mt-2 ml-auto ${request.signed_letter ? '' : 'opacity-60'}"
+     ${request.signed_letter ? `
+  <img 
+    src="${request.signed_letter}?t=${Date.now()}" 
+    class="h-20 mt-2 ml-auto"
   />
+` : ''} 
         <p class="font-bold mt-2">Community Councilor</p>
         <p class="text-sm text-gray-500">${request.approved_by || ''}</p>
       </div>
