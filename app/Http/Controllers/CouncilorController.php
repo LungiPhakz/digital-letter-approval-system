@@ -121,8 +121,10 @@ class CouncilorController extends Controller
             $path = $request->file('stamp')->store('stamps', 'public');
             $req->stamp = 'storage/' . $path; // ✅ just store path
 
-        } 
-        
+        } else {
+            $req->stamp = asset('images/default-stamp.png');
+        }
+
         // ===== APPROVAL =====
         $req->status = 'Approved';
         $req->approved_at = now();
