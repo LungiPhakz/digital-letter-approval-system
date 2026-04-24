@@ -474,10 +474,10 @@ if ($completed->count() > 0) {
             </td>
 
             <td class="border p-2">
-                <form method="POST" action="{{ route('councilor.approve', $request->id) }}" class="inline">
-                    @csrf
-                    <button class="px-2 py-1 bg-green-500 text-white rounded">Approve</button>
-                </form>
+                <button onclick="openApprovalModal({{ $request->id }})"
+    class="px-2 py-1 bg-green-500 text-white rounded">
+    Approve
+</button>
 
                 <form method="POST" action="{{ route('councilor.reject', $request->id) }}" class="inline">
                     @csrf
@@ -1508,6 +1508,7 @@ async function confirmReject() {
 
     const response = await fetch(`/councilor/reject/${currentSelectedRequest.id}`, {
     method: 'POST',
+     credentials: "same-origin",
     headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
