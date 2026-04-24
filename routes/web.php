@@ -53,20 +53,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/councilor/reject/{id}', [CouncilorController::class, 'reject'])
             ->name('councilor.reject');
 
-       
+       // ✅ FIXED: KEEP IT INSIDE GROUP
+        Route::post('/councilor/approve-with-signature/{id}', [CouncilorController::class, 'approveWithSignature'])
+            ->name('councilor.approve.signature');
 
         Route::post('/councilor/send/{id}', [CouncilorController::class, 'send'])
             ->name('councilor.send');
-
-
-              Route::get('/signature/{filename}', function ($filename) {
-   
-            
-     // ✅ FIXED: KEEP IT INSIDE GROUP
-        Route::post('/councilor/approve-with-signature/{id}', [CouncilorController::class, 'approveWithSignature'])
-            ->name('councilor.approve.signature');
     });
 
+     
 
     // ===== ADMIN =====
     Route::middleware('role:admin')->group(function () {
