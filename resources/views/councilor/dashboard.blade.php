@@ -703,6 +703,9 @@ if ($completed->count() > 0) {
             <canvas id="signature-canvas" width="280" height="120"
               class="w-full border-2 border-purple-300 rounded bg-white cursor-crosshair hover:shadow-lg transition">
             </canvas>
+            <p class="text-xs text-gray-600 mt-2">
+Default signature loaded. Draw to change it.
+</p>
 
             <p class="text-xs text-gray-600 mt-2">Draw your signature above</p>
 
@@ -1075,8 +1078,8 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
         </button>
       ` : ''}
 
-      ${request.signed_letter 
-    ? `<img src="${request.signed_letter}?t=${Date.now()}" class="h-20 mt-2 ml-auto" />`
+     ${request.signed_letter 
+    ? `<img src="${request.signed_letter}" class="h-20 mt-2 ml-auto" />`
     : `<img src="/images/default-signature.png" class="h-20 mt-2 ml-auto opacity-60" />`
 }
 
@@ -1152,7 +1155,16 @@ function initSignaturePad() {
     });
 
     currentSignaturePad.clear();
+
+    // ✅ LOAD DEFAULT SIGNATURE IMAGE
+    const img = new Image();
+    img.src = "/images/default-signature.png";
+
+    img.onload = function () {
+        ctx.drawImage(img, 0, 0, canvas.width / ratio, canvas.height / ratio);
+    };
 }
+
 function clearSignature() {
     if (currentSignaturePad) {
         currentSignaturePad.clear();
@@ -1173,6 +1185,7 @@ function saveSignature() {
     finalizeApprovalWithSignature();
 }
 
+let signatureData;
 async function finalizeApprovalWithSignature() {
 
     if (!currentSelectedRequest) {
@@ -1180,10 +1193,13 @@ async function finalizeApprovalWithSignature() {
         return;
     }
 
-    if (!currentSignaturePad || currentSignaturePad.isEmpty()) {
-       showToast("Please draw your signature first");
-        return;
-    }
+   if (currentSignaturePad && !currentSignaturePad.isEmpty()) {
+    // user drew new signature
+    signatureData = currentSignaturePad.toDataURL("image/png");
+} else {
+    // ✅ use default image
+    signatureData = "/images/default-signature.png";
+}
 
     const signatureData = currentSignaturePad.toDataURL("image/png");
 
