@@ -1461,6 +1461,7 @@ async function confirmApprove() {
     headers: {
       
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+         'X-Requested-With': 'XMLHttpRequest', // 🔥 ADD THIS
         'Accept': 'application/json'
     }
 });
@@ -1514,6 +1515,8 @@ async function confirmReject() {
     headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+         'X-Requested-With': 'XMLHttpRequest', // 🔥 ADD THIS
+        
         'Accept': 'application/json'
     },
     body: JSON.stringify({ reason })

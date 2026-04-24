@@ -66,9 +66,9 @@ class CouncilorController extends Controller
     // ================= APPROVE (NO SIGNATURE) =================
     public function approve($id)
     {
-        $letter = LetterRequest::findOrFail($id);
+         $request = LetterRequest::findOrFail($id);
 
-        $letter->update([
+         $request->update([
             'status' => 'Approved',
             'approved_by' => auth()->user()->name,
             'approved_at' => now(),
@@ -80,9 +80,9 @@ class CouncilorController extends Controller
     // ================= REJECT =================
     public function reject(Request $req, $id)
     {
-        $letter = LetterRequest::findOrFail($id);
+         $request = LetterRequest::findOrFail($id);
 
-        $letter->update([
+        $request->update([
             'status' => 'Rejected',
             'rejection_reason' => $req->reason
         ]);
