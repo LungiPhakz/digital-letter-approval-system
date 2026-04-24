@@ -99,22 +99,17 @@ class CouncilorController extends Controller
 
         // ===== SIGNATURE =====
    if ($request->signature === '/images/default-signature.png') {
+    $req->signed_letter = asset('images/default-signature.png');
+} else {
+    $image = str_replace('data:image/png;base64,', '', $request->signature);
+    $image = str_replace(' ', '+', $image);
 
-            // ✅ USE DEFAULT SIGNATURE (no saving)
-            $req->signed_letter = asset('images/default-signature.png');
+    $fileName = 'signatures/sign_' . time() . '_' . uniqid() . '.png';
 
-        } elseif ($request->signature) {
+    Storage::disk('public')->put($fileName, base64_decode($image));
 
-            // ✅ HANDLE BASE64 SIGNATURE
-            $image = str_replace('data:image/png;base64,', '', $request->signature);
-            $image = str_replace(' ', '+', $image);
-
-            $fileName = 'signatures/sign_' . time() . '_' . uniqid() . '.png';
-
-            Storage::disk('public')->put($fileName, base64_decode($image));
-
-            $req->signed_letter = asset('storage/' . $fileName);
-        }
+    $req->signed_letter = 'storage/' . $fileName;
+}
 
         // ===== STAMP =====
         if ($request->hasFile('stamp')) {

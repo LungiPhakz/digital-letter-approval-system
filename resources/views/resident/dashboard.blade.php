@@ -10,7 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+
 
 
 <style>
@@ -455,10 +455,12 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
 
       <div class="text-right">
 
-        ${request.signed_letter ? `
-          <img src="${request.signed_letter}" class="h-20 ml-auto mt-2" />
-        ` : `<div class="w-48 border-t-2 border-gray-400 mt-10"></div>`}
-
+        <img 
+    src="${request.signed_letter 
+        ? request.signed_letter + '?t=' + Date.now() 
+        : '/images/default-signature.png'}" 
+    class="h-20 mt-2 ml-auto ${request.signed_letter ? '' : 'opacity-60'}"
+  />
         <p class="font-bold mt-2">Community Councilor</p>
         <p class="text-sm text-gray-500">${request.approved_by || ''}</p>
       </div>

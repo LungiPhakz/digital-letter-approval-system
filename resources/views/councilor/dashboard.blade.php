@@ -7,7 +7,7 @@
     <title>Councilor Dashboard</title>
 
     <!-- Tailwind CSS CDN (optional, easier than writing all classes) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -703,9 +703,6 @@ if ($completed->count() > 0) {
             <canvas id="signature-canvas" width="280" height="120"
               class="w-full border-2 border-purple-300 rounded bg-white cursor-crosshair hover:shadow-lg transition">
             </canvas>
-            <p class="text-xs text-gray-600 mt-2">
-Default signature loaded. Draw to change it.
-</p>
 
             <p class="text-xs text-gray-600 mt-2">Draw your signature above</p>
 
@@ -1069,24 +1066,28 @@ ${request.address ? formatAddress(request.address) : 'N/A'}
   <!-- SIGNATURE (RIGHT SIDE) -->
   <div class="flex justify-end">
     
-    <div class="text-right">
+   <div class="text-right">
 
-      ${request.status === 'Approved' && !request.signed_letter ? `
-        <button onclick="openSigningModal(${request.id})"
-          class="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
-          ✍️ Sign Letter
-        </button>
-      ` : ''}
+  <!-- ALWAYS SHOW SIGNATURE AREA -->
+  <img 
+    src="${request.signed_letter 
+        ? request.signed_letter + '?t=' + Date.now() 
+        : '/images/default-signature.png'}" 
+    class="h-20 mt-2 ml-auto ${request.signed_letter ? '' : 'opacity-60'}"
+  />
 
-     ${request.signed_letter 
-    ? `<img src="${request.signed_letter}" class="h-20 mt-2 ml-auto" />`
-    : `<img src="/images/default-signature.png" class="h-20 mt-2 ml-auto opacity-60" />`
-}
+  <!-- SHOW BUTTON ONLY IF NOT SIGNED -->
+  ${request.status === 'Approved' && !request.signed_letter ? `
+    <button onclick="openSigningModal(${request.id})"
+      class="mt-3 px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
+      ✍️ Sign Letter
+    </button>
+  ` : ''}
 
-      <p class="font-bold mt-2">Community Councilor</p>
-      <p class="text-sm text-gray-500">${request.approved_by || ''}</p>
+  <p class="font-bold mt-2">Community Councilor</p>
+  <p class="text-sm text-gray-500">${request.approved_by || ''}</p>
 
-    </div>
+</div>
 
   </div>
 
@@ -1189,9 +1190,9 @@ let signatureData;
 async function finalizeApprovalWithSignature() {
 
     if (!currentSelectedRequest) {
-       showToast("No request selected");
-        return;
-    }
+    showToast("No request selected", "error");
+    return;
+}
 
    if (currentSignaturePad && !currentSignaturePad.isEmpty()) {
     // user drew new signature
@@ -1201,7 +1202,7 @@ async function finalizeApprovalWithSignature() {
     signatureData = "/images/default-signature.png";
 }
 
-    const signatureData = currentSignaturePad.toDataURL("image/png");
+   
 
     const formData = new FormData();
     formData.append('signature', signatureData);
