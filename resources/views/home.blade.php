@@ -301,6 +301,31 @@
     section {
   overflow-x: hidden;
 }
+
+.sparkle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: floatSparkle 6s infinite ease-in-out;
+}
+
+.sparkle:nth-child(1) { top: 20%; left: 10%; }
+.sparkle:nth-child(2) { top: 50%; left: 30%; animation-delay: 2s; }
+.sparkle:nth-child(3) { top: 70%; left: 60%; animation-delay: 4s; }
+.sparkle:nth-child(4) { top: 30%; left: 80%; animation-delay: 1s; }
+
+@keyframes floatSparkle {
+  0% { transform: translateY(0); opacity: 0.2; }
+  50% { transform: translateY(-20px); opacity: 0.8; }
+  100% { transform: translateY(0); opacity: 0.2; }
+}
+
+
+
+
   </style>
 
   <style>body { box-sizing: border-box; }</style>
@@ -326,6 +351,15 @@ Get Started
      </div>
     </nav><!-- Hero Section - Storytelling -->
     <section id="hero" class="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white relative overflow-hidden flex items-center"><!-- Animated Background Elements -->
+
+     <!-- ✨ Sparkle Effect Layer (ADD THIS HERE) -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+  </div>
+
      <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
      <div class="absolute bottom-0 right-0 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 2s;"></div>
      <div class="max-w-7xl mx-auto px-6 relative z-10 py-20">
@@ -488,11 +522,18 @@ Get Started
     <section class="w-full py-16 bg-white border-t border-gray-200">
      <div class="max-w-7xl mx-auto px-6">
       <div class="grid md:grid-cols-4 gap-8 text-center">
+        <div class="animate-fade-in" style="animation-delay: 0.3s;">
+        <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+         &lt;Secure
+        </div>
+        <p class="text-gray-600 mt-2">Data Protection</p>
+       </div>
+
        <div class="animate-fade-in">
         <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
           {{ \App\Models\LetterRequest::count() }}+
         </div>
-        <p class="text-gray-600 mt-2">Requests Submitted<</p>
+        <p class="text-gray-600 mt-2">Requests Submitted</p>
        </div>
        <div class="animate-fade-in" style="animation-delay: 0.1s;">
         <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
@@ -506,12 +547,7 @@ Get Started
         </div>
         <p class="text-gray-600 mt-2">System Availability</p>
        </div>
-       <div class="animate-fade-in" style="animation-delay: 0.3s;">
-        <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-         &lt;Secure
-        </div>
-        <p class="text-gray-600 mt-2">Data Protection</p>
-       </div>
+       
       </div>
      </div>
     </section><!-- Contact Section -->
