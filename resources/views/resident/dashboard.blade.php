@@ -185,7 +185,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
     </div>
 
     <!-- FORM -->
-    <form method="POST" action="{{ route('resident.request.store') }}" class="p-6 space-y-4">
+    <form id="requestForm" method="POST" action="{{ route('resident.request.store') }}" class="p-6 space-y-4">
       @csrf
 
       <!-- Request Type -->
@@ -215,6 +215,8 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
   <input type="text" id="id_number" required
          placeholder="Enter your 13-digit SA ID number"
          class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg">
+
+         <p id="id_error" class="text-sm text-red-600 mt-1 hidden"></p>
 </div>
 
      <div>
@@ -225,14 +227,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
          placeholder="Detecting your location..." />
 </div>
       <!-- Address Accuracy -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Address Accuracy</label>
-        <select name="address_accuracy" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg">
-          <option value="">Select address accuracy</option>
-          <option value="exact">Exact Address</option>
-          <option value="approximate">Approximate / Nearby</option>
-        </select>
-      </div>
+     
       <input type="hidden" name="address" id="address">
       <!-- Hidden GPS Fields -->
       <input type="hidden" name="latitude" id="latitude">
@@ -289,60 +284,90 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
 </div>
 
 <script>
-function isValidSAID(id) {
-    // Must be 13 digits
-    if (!/^\d{13}$/.test(id)) return false;
+// ===== VALIDATION FUNCTION =====
+function validateSAIDLive(id) {
+    if (id.length === 0) return null;
 
-    // Basic date validation (YYMMDD)
-    const dob = id.substring(0, 6);
-    const year = parseInt(dob.substring(0, 2));
-    const month = parseInt(dob.substring(2, 4));
-    const day = parseInt(dob.substring(4, 6));
-
-    if (month < 1 || month > 12) return false;
-    if (day < 1 || day > 31) return false;
-
-    return true;
-}
-
-document.querySelector("form").addEventListener("submit", function (e) {
-    const id = document.getElementById("id_number").value.trim();
-
-    if (!isValidSAID(id)) {
-        e.preventDefault(); // stop form submit
-
-       showError("The ID number entered could not be verified as a valid South African identity number. Please ensure it contains 13 digits and is correctly formatted.");
-        return false;
+    if (!/^\d*$/.test(id)) {
+        return "Only numbers are allowed.";
     }
-});
 
-function showError(message) {
-    const popup = document.createElement("div");
-
-    popup.innerHTML = `
-        <div style="
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 16px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 9999;
-            font-weight: 600;
-        ">
-            ${message}
-        </div>
-    `;
-
-    document.body.appendChild(popup);
-
-    setTimeout(() => popup.remove(), 4000);
+    if (id.length < 13 && id.length > 0) {
+    return null; // don't show error yet while typing
 }
-</script>
 
-<script>
+    if (id.length > 13) {
+        return "Too many digits (max is 13).";
+    }
+
+    if (id.length === 13) {
+        const month = parseInt(id.substring(2, 4));
+        const day = parseInt(id.substring(4, 6));
+
+        if (month < 1 || month > 12) {
+            return "Invalid birth month in ID.";
+        }
+
+        if (day < 1 || day > 31) {
+            return "Invalid birth day in ID.";
+        }
+    }
+
+    return null;
+}
+
+// ===== ELEMENTS =====
+const requestForm = document.getElementById("requestForm");
+const idInput = document.getElementById("id_number");
+const errorText = document.getElementById("id_error");
+
+// ===== LIVE VALIDATION =====
+if (idInput) {
+    idInput.addEventListener("input", function () {
+
+        const value = idInput.value.trim();
+        const error = validateSAIDLive(value);
+
+        if (error) {
+            errorText.textContent = error;
+            errorText.classList.remove("hidden");
+
+            idInput.classList.add("border-red-500");
+            idInput.classList.remove("border-gray-300", "border-green-500");
+
+        } else {
+            errorText.classList.add("hidden");
+
+            idInput.classList.remove("border-red-500");
+
+            if (value.length === 13) {
+                idInput.classList.add("border-green-500");
+            } else {
+                idInput.classList.remove("border-green-500");
+                idInput.classList.add("border-gray-300");
+            }
+        }
+    });
+}
+
+// ===== SUBMIT VALIDATION =====
+if (requestForm) {
+    requestForm.addEventListener("submit", function (e) {
+
+        const value = idInput.value.trim();
+        const error = validateSAIDLive(value);
+
+        if (error || value.length !== 13) {
+            e.preventDefault();
+
+            errorText.textContent = error || "Please enter a valid 13-digit ID number.";
+            errorText.classList.remove("hidden");
+
+            idInput.classList.add("border-red-500");
+            idInput.focus();
+        }
+    });
+}          
 
 
 

@@ -29,7 +29,7 @@ class RequestController extends Controller
             'letter_type' => 'required|string',
             'purpose_type' => 'required|string',
             'address' => 'required|string',
-            'address_accuracy' => 'required|in:exact,approximate',
+           
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
@@ -39,7 +39,7 @@ class RequestController extends Controller
             'letter_type' => $request->letter_type,
             'purpose_type' => $request->purpose_type,
             'address' => $request->address,
-            'address_accuracy' => $request->address_accuracy,
+           
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'status' => 'Pending',
