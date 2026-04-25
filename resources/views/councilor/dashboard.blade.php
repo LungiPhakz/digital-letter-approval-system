@@ -784,7 +784,7 @@ if ($completed->count() > 0) {
   </div>
 </div>
 
-<!-- DELETE CONFIRM POPUP -->
+<!-- DELETE CONFIRM POPUP (COUNCILOR SIDE) -->
 <div id="delete-popup" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
 
   <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-scale-in">
@@ -804,7 +804,7 @@ if ($completed->count() > 0) {
       </div>
 
       <p class="text-sm text-gray-500">
-        This action cannot be undone.
+        This action cannot be undone and will permanently remove the record.
       </p>
     </div>
 
@@ -819,7 +819,7 @@ if ($completed->count() > 0) {
 
       <form id="deleteForm" method="POST" class="flex-1">
         @csrf
-        @method('DELETE')
+        
 
         <button 
           type="submit"
@@ -1433,16 +1433,12 @@ if (request.status === 'Approved') {
         </td>
         <td class="px-6 py-4">
 
-<form id="deleteForm" method="POST">
-    @csrf
-    @method('DELETE')
-
     <button 
-        type="submit"
-        class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
+        type="button"
+        onclick="openDeleteConfirm({{ $request->id }})"
+        class="text-red-600 font-semibold hover:underline">
         Delete
     </button>
-</form>
 
 </td>
       </tr>
@@ -1805,9 +1801,15 @@ function showToast(message, type = 'success') {
 
 
 
-ffunction openDeleteConfirm(id) {
+let deleteId = null;
+
+function openDeleteConfirm(id) {
+    deleteId = id;
+
     const form = document.getElementById('deleteForm');
-    form.action = `/councilor/request/delete/${id}`;
+
+    // CHANGE THIS ROUTE to your actual delete route
+    form.action = `/councilor/request/${id}`;
 
     document.getElementById('delete-popup').classList.remove('hidden');
 }

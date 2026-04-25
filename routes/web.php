@@ -40,8 +40,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/resident/request-letter', [RequestController::class, 'store'])
             ->name('resident.request.store');
-            
-            Route::post('/resident/request/cancel/{id}', [RequestController::class, 'cancel'])
+
+            Route::post('/resident/request/{id}/cancel', [RequestController::class, 'cancel'])
     ->name('resident.request.cancel');
     });
 
