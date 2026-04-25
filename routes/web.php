@@ -41,6 +41,15 @@ Route::middleware(['auth'])->group(function () {
             ->name('resident.request.store');
     });
 
+
+    Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect()->route('role');
+})->name('logout');
+
     // ===== COUNCILOR =====
     Route::middleware('role:councilor,admin')->group(function () {
 

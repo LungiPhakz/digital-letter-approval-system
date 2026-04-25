@@ -354,10 +354,15 @@ if ($completed->count() > 0) {
 
     <!-- RIGHT SIDE WRAPPER -->
     <div class="flex justify-end md:justify-end w-full md:w-auto">
-        <button onclick="handleCouncilorLogout()"
-            class="px-6 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100 transition">
-            Logout
-        </button>
+        <form method="POST" action="{{ route('logout') }}">
+    @csrf
+
+    <button
+        type="submit"
+        class="px-6 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100 transition">
+        Logout
+    </button>
+</form>
     </div>
 
 </div>

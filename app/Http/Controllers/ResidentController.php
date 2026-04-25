@@ -19,6 +19,17 @@ class ResidentController extends Controller
         return view('role');
     }
 
+    public function logout(Request $request)
+{
+    Auth::logout();
+
+    $request->session()->invalidate();
+
+    $request->session()->regenerateToken();
+
+    return redirect()->route('home');
+}
+
     // Handle Resident login
     public function login(Request $request)
     {

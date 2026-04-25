@@ -142,6 +142,18 @@ class CouncilorController extends Controller
         ], 500);
     }
 }
+
+public function logout(Request $request)
+{
+    Auth::logout();
+
+    $request->session()->invalidate();
+
+    $request->session()->regenerateToken();
+
+    return redirect()->route('home');
+}
+
     public function send($id)
     {
         $request = LetterRequest::findOrFail($id);

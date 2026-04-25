@@ -60,7 +60,15 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
         <h1 class="text-3xl font-bold">Welcome, <span>{{ auth()->user()->name }}</span>!</h1>
         <p class="opacity-90 mt-1">Manage your letter requests</p>
       </div>
-      <button onclick="handleResidentLogout()" class="px-6 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100 transition">Logout</button>
+      <form method="POST" action="{{ route('logout') }}">
+    @csrf
+
+    <button
+        type="submit"
+        class="px-6 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100 transition">
+        Logout
+    </button>
+</form>
     </div>
   </div>
 
