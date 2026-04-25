@@ -22,6 +22,7 @@ class CouncilorController extends Controller
     if (Auth::attempt($credentials)) {
 
         $user = Auth::user();
+        session()->regenerate();
 
         // 🔒 Role check
         if (!in_array($user->role, ['councilor', 'admin'])) {
