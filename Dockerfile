@@ -32,6 +32,9 @@ COPY . .
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
+# ✅ FIX PERMISSIONS (VERY IMPORTANT)
+RUN chmod -R 775 storage bootstrap/cache
+
 # Expose port
 EXPOSE 10000
 
