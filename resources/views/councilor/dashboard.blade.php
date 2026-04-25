@@ -1809,7 +1809,7 @@ function openDeleteConfirm(id) {
     const form = document.getElementById('deleteForm');
 
     // CHANGE THIS ROUTE to your actual delete route
-    form.action = `/councilor/request/${id}`;
+    form.action = `/councilor/request/delete/{id}`;
 
     document.getElementById('delete-popup').classList.remove('hidden');
 }
