@@ -49,6 +49,10 @@
       font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
+    html {
+  scroll-behavior: smooth;
+}
+
     .gradient-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
@@ -486,27 +490,27 @@ Get Started
       <div class="grid md:grid-cols-4 gap-8 text-center">
        <div class="animate-fade-in">
         <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-         10K+
+          {{ \App\Models\LetterRequest::count() }}+
         </div>
-        <p class="text-gray-600 mt-2">Happy Residents</p>
+        <p class="text-gray-600 mt-2">Requests Submitted<</p>
        </div>
        <div class="animate-fade-in" style="animation-delay: 0.1s;">
         <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-         50+
+         {{ \App\Models\User::where('role','resident')->count() }}+
         </div>
-        <p class="text-gray-600 mt-2">Communities Served</p>
+        <p class="text-gray-600 mt-2">Registered Residents</p>
        </div>
        <div class="animate-fade-in" style="animation-delay: 0.2s;">
         <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-         99.9%
+          24/7
         </div>
-        <p class="text-gray-600 mt-2">Uptime Guarantee</p>
+        <p class="text-gray-600 mt-2">System Availability</p>
        </div>
        <div class="animate-fade-in" style="animation-delay: 0.3s;">
         <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-         &lt;5min
+         &lt;Secure
         </div>
-        <p class="text-gray-600 mt-2">Average Processing</p>
+        <p class="text-gray-600 mt-2">Data Protection</p>
        </div>
       </div>
      </div>
@@ -523,21 +527,21 @@ Get Started
          📧
         </div>
         <h3 class="text-xl font-bold text-gray-800 mb-2">Email</h3>
-        <p class="text-gray-600">support@communityletters.local</p>
+        <p class="text-gray-600">support@communityletters.app</p>
        </div>
        <div class="bg-white rounded-2xl shadow-lg p-8 text-center border-t-4 border-pink-600 hover:shadow-xl transition">
         <div class="text-5xl mb-4">
          📞
         </div>
         <h3 class="text-xl font-bold text-gray-800 mb-2">Phone</h3>
-        <p class="text-gray-600">+1 (555) 123-4567</p>
+        <p class="text-gray-600">+27 79 102 8667</p>
        </div>
        <div class="bg-white rounded-2xl shadow-lg p-8 text-center border-t-4 border-blue-600 hover:shadow-xl transition">
         <div class="text-5xl mb-4">
          🏢
         </div>
         <h3 class="text-xl font-bold text-gray-800 mb-2">Office</h3>
-        <p class="text-gray-600">Community Center, Main St</p>
+        <p class="text-gray-600">Pretoria, South Africa</p>
        </div>
       </div>
      </div>
@@ -556,35 +560,37 @@ Get Started
         <div class="text-2xl font-bold text-white mb-4">
          📜 CommunityLetters
         </div>
-        <p class="text-sm">Making community services accessible to everyone</p>
+        <p class="text-sm"> Simplifying proof of residence requests for modern communities — fast, secure, and reliable.</p>
        </div>
        <div>
-        <h4 class="font-semibold text-white mb-4">Product</h4>
-        <ul class="space-y-2 text-sm">
-         <li><a href="#" class="hover:text-white transition">How it works</a></li>
-         <li><a href="#" class="hover:text-white transition">Features</a></li>
-         <li><a href="#" class="hover:text-white transition">Pricing</a></li>
-        </ul>
-       </div>
-       <div>
-        <h4 class="font-semibold text-white mb-4">Company</h4>
-        <ul class="space-y-2 text-sm">
-         <li><a href="#" class="hover:text-white transition">About</a></li>
-         <li><a href="#" class="hover:text-white transition">Blog</a></li>
-         <li><a href="#" class="hover:text-white transition">Careers</a></li>
-        </ul>
-       </div>
-       <div>
-        <h4 class="font-semibold text-white mb-4">Legal</h4>
-        <ul class="space-y-2 text-sm">
-         <li><a href="#" class="hover:text-white transition">Privacy</a></li>
-         <li><a href="#" class="hover:text-white transition">Terms</a></li>
-         <li><a href="#" class="hover:text-white transition">Security</a></li>
-        </ul>
-       </div>
+  <h4 class="font-semibold text-white mb-4">Product</h4>
+  <ul class="space-y-2 text-sm">
+    <li><button onclick="scrollToAbout()" class="hover:text-white transition">How it works</button></li>
+    <li><button onclick="scrollToFeatures()" class="hover:text-white transition">Features</button></li>
+    <li><button onclick="scrollToHero()" class="hover:text-white transition">Overview</button></li>
+  </ul>
+</div>
+
+<div>
+  <h4 class="font-semibold text-white mb-4">Company</h4>
+  <ul class="space-y-2 text-sm">
+    <li><button onclick="scrollToAbout()" class="hover:text-white transition">About</button></li>
+    <li><button onclick="scrollToContact()" class="hover:text-white transition">Contact</button></li>
+    <li><button onclick="scrollToHero()" class="hover:text-white transition">Home</button></li>
+  </ul>
+</div>
+
+<div>
+  <h4 class="font-semibold text-white mb-4">Legal</h4>
+  <ul class="space-y-2 text-sm">
+    <li><button onclick="scrollToContact()" class="hover:text-white transition">Privacy Policy</button></li>
+    <li><button onclick="scrollToContact()" class="hover:text-white transition">Terms of Service</button></li>
+    <li><button onclick="scrollToContact()" class="hover:text-white transition">Security</button></li>
+  </ul>
+</div>
       </div>
       <div class="border-t border-gray-700 pt-8 text-center text-sm">
-       <p>© 2024 Digital Community Letter Management. All rights reserved.</p>
+     <p>© {{ now()->year }} Digital Community Letter Management. All rights reserved.</p>
       </div>
      </div>
     </footer>
