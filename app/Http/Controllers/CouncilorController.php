@@ -157,11 +157,9 @@ public function logout(Request $request)
 
 
 
-public function resetDatabase()
+public function resetDatabase(Request $request)
 {
-    if (!auth()->user()->is_admin) {
-        abort(403);
-    }
+   
 
     DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
