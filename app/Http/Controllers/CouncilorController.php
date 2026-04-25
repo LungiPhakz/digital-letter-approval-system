@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\LetterRequest;
-use Illuminate\Support\Facades\DB;
 
 class CouncilorController extends Controller
 {
@@ -155,20 +154,12 @@ public function logout(Request $request)
     return redirect()->route('home');
 }
 
-
-
-public function resetDatabase()
+public function destroy($id)
 {
-   
+   $request = LetterRequest::findOrFail($id);
+    $request->delete();
 
-   // ✅ PostgreSQL-safe reset
-    \Illuminate\Support\Facades\DB::table('requests')->truncate();
-
-    \Illuminate\Support\Facades\DB::table('users')
-        ->where('role', 'resident')
-        ->delete();
-
-    return back()->with('success', 'Database reset successfully');
+    return back()->with('success', 'Request deleted successfully');
 }
 
     public function send($id)

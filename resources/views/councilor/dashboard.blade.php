@@ -354,16 +354,7 @@ if ($completed->count() > 0) {
 
     <!-- RIGHT SIDE WRAPPER -->
     <div class="flex justify-end md:justify-end w-full md:w-auto">
-       <!-- RESET DB BUTTON (DANGER) -->
-    <form method="POST" action="{{ route('admin.reset.database') }}"
-          onsubmit="return confirm('⚠️ Are you sure you want to delete ALL data? This cannot be undone!');">
-        @csrf
-        <button type="submit"
-            class="px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition">
-            Reset DB
-        </button>
-    </form>
-    
+      
         <form method="POST" action="{{ route('logout') }}">
     @csrf
 
@@ -565,6 +556,7 @@ if ($completed->count() > 0) {
            <th class="px-6 py-3 text-left font-semibold text-gray-700">Status</th>
            <th class="px-6 py-3 text-left font-semibold text-gray-700">Submitted</th>
            <th class="px-6 py-3 text-left font-semibold text-gray-700">Days to Process</th>
+            <th class="px-6 py-3 text-left font-semibold text-gray-700">Delete</th>
           </tr>
          </thead>
          <tbody id="report-details-list">
@@ -1391,6 +1383,17 @@ if (request.status === 'Approved') {
         <td class="px-6 py-4 text-gray-700 font-semibold">
             ${days}
         </td>
+        <td class="px-6 py-4">
+    <form method="POST" action="/councilor/request/delete/${request.id}"
+        onsubmit="return confirm('Are you sure you want to delete this request? This cannot be undone!')">
+       <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+
+        <button type="submit"
+            class="text-red-600 font-semibold hover:underline">
+            Delete
+        </button>
+    </form>
+</td>
       </tr>
     `;
 }).join('');

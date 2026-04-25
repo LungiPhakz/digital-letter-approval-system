@@ -118,6 +118,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
           <th class="px-6 py-3 text-left font-semibold text-gray-700">Status</th>
           <th class="px-6 py-3 text-left font-semibold text-gray-700">Date</th>
           <th class="px-6 py-3 text-left font-semibold text-gray-700">Actions</th>
+           <th class="px-6 py-3 text-left font-semibold text-gray-700">Cancel</th>
         </tr>
       </thead>
 
@@ -160,6 +161,26 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
                    View
             </button>
           </td>
+          <td class="px-6 py-4 flex gap-3 items-center">
+
+    <button 
+        onclick="openReviewModal({{ $request->id }})" 
+        class="text-purple-600 font-semibold hover:underline">
+        View
+    </button>
+
+    @if($request->status == 'Pending')
+        <form method="POST" action="{{ route('resident.request.cancel', $request->id) }}">
+            @csrf
+            <button type="submit"
+                class="text-yellow-600 font-semibold hover:underline"
+                onclick="return confirm('Are you sure you want to cancel this request?')">
+                Cancel
+            </button>
+        </form>
+    @endif
+
+</td>
 
         </tr>
         @endforeach

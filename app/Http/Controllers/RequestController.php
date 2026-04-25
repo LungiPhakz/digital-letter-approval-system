@@ -52,4 +52,23 @@ class RequestController extends Controller
 
          
     }
+
+    public function cancel($id)
+{
+    $request = LetterRequest::findOrFail($id);
+
+    if ($request->user_id !== auth()->id()) {
+        abort(403);
+    }
+
+    // Only allow cancel if still pending
+    if ($request->status !== 'Pending') {
+        return back()->with('error', 'Only pending requests can be cancelled');
+    }
+
+    $request->status = 'Cancelled';
+    $request->save();
+
+    return back()->with('success', 'Request cancelled successfully');
+}
 }

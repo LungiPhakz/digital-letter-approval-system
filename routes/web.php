@@ -60,9 +60,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/councilor/send/{id}', [CouncilorController::class, 'send'])
             ->name('councilor.send');
 
-            Route::post('/admin/reset-database', [CouncilorController::class, 'resetDatabase'])
-    ->name('admin.reset.database');
     
+
+            Route::post('/resident/request/cancel/{id}', [RequestController::class, 'cancel'])
+    ->name('resident.request.cancel');
+
+    Route::post('/councilor/request/delete/{id}', [CouncilorController::class, 'destroy'])
+    ->name('councilor.request.delete');
     });
 
     // ================= ADMIN =================
