@@ -1433,12 +1433,16 @@ if (request.status === 'Approved') {
         </td>
         <td class="px-6 py-4">
 
+<form id="deleteForm" method="POST">
+    @csrf
+    @method('DELETE')
+
     <button 
-        type="button"
-        onclick="openDeleteConfirm({{ $request->id }})"
-        class="text-red-600 font-semibold hover:underline">
+        type="submit"
+        class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
         Delete
     </button>
+</form>
 
 </td>
       </tr>
@@ -1801,10 +1805,8 @@ function showToast(message, type = 'success') {
 
 
 
-function openDeleteConfirm(id) {
+ffunction openDeleteConfirm(id) {
     const form = document.getElementById('deleteForm');
-
-    // IMPORTANT: update this route to match your Laravel route
     form.action = `/councilor/request/delete/${id}`;
 
     document.getElementById('delete-popup').classList.remove('hidden');

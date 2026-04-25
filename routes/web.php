@@ -40,6 +40,9 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/resident/request-letter', [RequestController::class, 'store'])
             ->name('resident.request.store');
+            
+            Route::post('/resident/request/cancel/{id}', [RequestController::class, 'cancel'])
+    ->name('resident.request.cancel');
     });
 
     // ================= COUNCILOR + ADMIN =================
@@ -62,8 +65,7 @@ Route::middleware(['auth'])->group(function () {
 
     
 
-            Route::post('/resident/request/cancel/{id}', [RequestController::class, 'cancel'])
-    ->name('resident.request.cancel');
+            
 
     Route::post('/councilor/request/delete/{id}', [CouncilorController::class, 'destroy'])
     ->name('councilor.request.delete');

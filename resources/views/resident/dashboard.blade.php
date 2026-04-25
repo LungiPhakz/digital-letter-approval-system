@@ -118,7 +118,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
           <th class="px-6 py-3 text-left font-semibold text-gray-700">Status</th>
           <th class="px-6 py-3 text-left font-semibold text-gray-700">Date</th>
           <th class="px-6 py-3 text-left font-semibold text-gray-700">Actions</th>
-           <th class="px-6 py-3 text-left font-semibold text-gray-700">Cancel</th>
+           
         </tr>
       </thead>
 
@@ -160,17 +160,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
                 class="text-purple-600 font-semibold hover:underline">
                    View
             </button>
-          </td>
-          
-          <td class="px-6 py-4 flex gap-3 items-center">
-
-    <button 
-        onclick="openReviewModal({{ $request->id }})" 
-        class="text-purple-600 font-semibold hover:underline">
-        View
-    </button>
-
-    @if($request->status == 'Pending')
+            @if($request->status == 'Pending')
         <button 
             type="button"
             onclick="openCancelModal({{ $request->id }})"
@@ -178,9 +168,9 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
             Cancel
         </button>
     @endif
-
-</td>
-
+          </td>
+          
+          
         </tr>
         @endforeach
 
