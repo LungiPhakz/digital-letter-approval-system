@@ -36,11 +36,12 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chmod -R 775 storage bootstrap/cache
 
 # ✅ Cache configs (BUILD TIME)
-# Cache during build (IMPORTANT)
-RUN php artisan config:cache && \
+RUN php artisan config:clear && \
+    php artisan route:clear && \
+    php artisan view:clear && \
+    php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
-
 
 # Expose port
 EXPOSE 10000
