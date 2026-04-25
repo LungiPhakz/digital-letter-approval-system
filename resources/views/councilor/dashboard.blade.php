@@ -784,6 +784,54 @@ if ($completed->count() > 0) {
   </div>
 </div>
 
+<!-- DELETE CONFIRM POPUP -->
+<div id="delete-popup" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-scale-in">
+
+    <!-- Header -->
+    <div class="bg-red-600 text-white px-6 py-4">
+      <h2 class="text-lg font-bold">Delete Request</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="text-3xl">🗑️</div>
+        <p class="text-gray-700 font-medium">
+          Are you sure you want to delete this request?
+        </p>
+      </div>
+
+      <p class="text-sm text-gray-500">
+        This action cannot be undone.
+      </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 p-6 pt-0">
+
+      <button 
+        onclick="closeDeleteConfirm()"
+        class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-100 transition">
+        Cancel
+      </button>
+
+      <form id="deleteForm" method="POST" class="flex-1">
+        @csrf
+        @method('DELETE')
+
+        <button 
+          type="submit"
+          class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
+          Delete
+        </button>
+      </form>
+
+    </div>
+
+  </div>
+</div>
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1384,15 +1432,14 @@ if (request.status === 'Approved') {
             ${days}
         </td>
         <td class="px-6 py-4">
-    <form method="POST" action="/councilor/request/delete/${request.id}"
-        onsubmit="return confirm('Are you sure you want to delete this request? This cannot be undone!')">
-       <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
 
-        <button type="submit"
-            class="text-red-600 font-semibold hover:underline">
-            Delete
-        </button>
-    </form>
+    <button 
+        type="button"
+        onclick="openDeleteConfirm({{ $request->id }})"
+        class="text-red-600 font-semibold hover:underline">
+        Delete
+    </button>
+
 </td>
       </tr>
     `;
@@ -1750,6 +1797,21 @@ function showToast(message, type = 'success') {
     setTimeout(() => {
         toast.remove();
     }, 3000);
+}
+
+
+
+function openDeleteConfirm(id) {
+    const form = document.getElementById('deleteForm');
+
+    // IMPORTANT: update this route to match your Laravel route
+    form.action = `/councilor/request/delete/${id}`;
+
+    document.getElementById('delete-popup').classList.remove('hidden');
+}
+
+function closeDeleteConfirm() {
+    document.getElementById('delete-popup').classList.add('hidden');
 }
 </script>
 

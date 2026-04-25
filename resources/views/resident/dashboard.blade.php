@@ -161,6 +161,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
                    View
             </button>
           </td>
+          
           <td class="px-6 py-4 flex gap-3 items-center">
 
     <button 
@@ -170,14 +171,12 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
     </button>
 
     @if($request->status == 'Pending')
-        <form method="POST" action="{{ route('resident.request.cancel', $request->id) }}">
-            @csrf
-            <button type="submit"
-                class="text-yellow-600 font-semibold hover:underline"
-                onclick="return confirm('Are you sure you want to cancel this request?')">
-                Cancel
-            </button>
-        </form>
+        <button 
+            type="button"
+            onclick="openCancelModal({{ $request->id }})"
+            class="text-yellow-600 font-semibold hover:underline">
+            Cancel
+        </button>
     @endif
 
 </td>
@@ -196,6 +195,50 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
 
 
    <!-- REQUEST MODAL (RESIDENT) -->
+    <!-- CANCEL CONFIRM MODAL -->
+<div id="cancel-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
+
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-scale-in overflow-hidden">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4">
+      <h2 class="text-xl font-bold">Cancel Request</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6">
+      <p class="text-gray-700 text-sm">
+        Are you sure you want to cancel this request? This action cannot be undone.
+      </p>
+
+      <div class="flex items-center gap-2 mt-4 text-red-600 text-sm">
+        ⚠️ Your request will be removed from pending processing.
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex gap-3 p-6 pt-0">
+
+      <button 
+        onclick="closeCancelModal()"
+        class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-100 transition">
+        No, Keep It
+      </button>
+
+      <form id="cancelForm" method="POST" class="flex-1">
+        @csrf
+        <button 
+          type="submit"
+          class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
+          Yes, Cancel
+        </button>
+      </form>
+
+    </div>
+
+  </div>
+</div>
+
 <div id="request-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
   <div class="card-modern max-w-md w-full animate-scale-in">
 
@@ -699,6 +742,20 @@ function formatAddress(address) {
     .join('<br>');
 }
 
+let selectedRequestId = null;
+
+function openCancelModal(id) {
+    selectedRequestId = id;
+
+    const form = document.getElementById('cancelForm');
+    form.action = `/resident/request/${id}/cancel`; // adjust route if needed
+
+    document.getElementById('cancel-modal').classList.remove('hidden');
+}
+
+function closeCancelModal() {
+    document.getElementById('cancel-modal').classList.add('hidden');
+}
 
 const allRequests = @json($allRequests);
 </script>
