@@ -39,4 +39,4 @@ RUN chmod -R 775 storage bootstrap/cache
 EXPOSE 10000
 
 # Start app
-CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan serve --host=0.0.0.0 --port=10000"]
+CMD ["sh", "-c", "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && php -S 0.0.0.0:10000 -t public"]

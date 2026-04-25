@@ -128,24 +128,24 @@ Login to Dashboard
 </div>
 
 </div>
+
 <script>
-<script>
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
+public function login(Request $request)
+{
+    logger('SESSION ID BEFORE: ' . session()->getId());
 
-    toast.className = `notification-toast toast-${type}`;
-    toast.textContent = message;
+    $credentials = $request->only('email', 'password');
 
-    document.body.appendChild(toast);
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
 
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = '0.4s ease';
-    }, 2500);
+        logger('SESSION ID AFTER: ' . session()->getId());
 
-    setTimeout(() => toast.remove(), 3000);
+        return redirect()->route('councilor.dashboard');
+    }
+
+    return back()->with('error', 'Invalid Login Details');
 }
-</script>
 </script>
 </body>
 </html>

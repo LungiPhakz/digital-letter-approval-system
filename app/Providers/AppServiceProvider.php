@@ -31,8 +31,7 @@ class AppServiceProvider extends ServiceProvider
     // ✅ Run migrations & seed (safe for Render free plan)
     if (app()->environment('production')) {
         try {
-            Artisan::call('migrate', ['--force' => true]);
-            Artisan::call('db:seed', ['--force' => true]);
+           
         } catch (\Exception $e) {
             // Prevent app crash if DB not ready yet
         }
