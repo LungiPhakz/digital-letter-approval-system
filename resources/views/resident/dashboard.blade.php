@@ -457,7 +457,7 @@ function buildLetter(request) {
  <p><strong>Current Address:</strong><br>
 ${request.address ? formatAddress(request.address) : 'N/A'}
 </p>
-        <p><strong>Letter SType:</strong> ${request.letter_type}</p>
+        <p><strong>Letter Type:</strong> ${request.letter_type}</p>
         <p><strong>Reference:</strong> ${request.reference_number}</p>
       </div>
 

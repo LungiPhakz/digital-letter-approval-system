@@ -325,6 +325,9 @@
 
 
 
+.grass-glow {
+  background: radial-gradient(circle at bottom, rgba(34,197,94,0.2), transparent 70%);
+}
 
   </style>
 
@@ -350,7 +353,7 @@ Get Started
 </button>
      </div>
     </nav><!-- Hero Section - Storytelling -->
-    <section id="hero" class="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white relative overflow-hidden flex items-center"><!-- Animated Background Elements -->
+    <section id="hero" class=" grass-glow w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white relative overflow-hidden flex items-center"><!-- Animated Background Elements -->
 
      <!-- ✨ Sparkle Effect Layer (ADD THIS HERE) -->
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
