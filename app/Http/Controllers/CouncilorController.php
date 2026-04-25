@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\LetterRequest;
+use Illuminate\Support\Facades\DB;
 
 class CouncilorController extends Controller
 {
@@ -152,6 +153,24 @@ public function logout(Request $request)
     $request->session()->regenerateToken();
 
     return redirect()->route('home');
+}
+
+
+
+public function resetDatabase()
+{
+    if (!auth()->user()->is_admin) {
+        abort(403);
+    }
+
+    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+    DB::table('requests')->truncate();
+    DB::table('users')->where('role', 'resident')->delete();
+
+    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+    return back()->with('success', 'Database reset successfully');
 }
 
     public function send($id)

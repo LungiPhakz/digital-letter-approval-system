@@ -59,6 +59,10 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/councilor/send/{id}', [CouncilorController::class, 'send'])
             ->name('councilor.send');
+
+            Route::post('/admin/reset-database', [CouncilorController::class, 'resetDatabase'])
+    ->name('admin.reset.database')
+    ->middleware('auth');
     });
 
     // ================= ADMIN =================

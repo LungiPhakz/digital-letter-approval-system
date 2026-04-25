@@ -354,6 +354,16 @@ if ($completed->count() > 0) {
 
     <!-- RIGHT SIDE WRAPPER -->
     <div class="flex justify-end md:justify-end w-full md:w-auto">
+       <!-- RESET DB BUTTON (DANGER) -->
+    <form method="POST" action="{{ route('admin.reset.database') }}"
+          onsubmit="return confirm('⚠️ Are you sure you want to delete ALL data? This cannot be undone!');">
+        @csrf
+        <button type="submit"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition">
+            Reset DB
+        </button>
+    </form>
+    
         <form method="POST" action="{{ route('logout') }}">
     @csrf
 
