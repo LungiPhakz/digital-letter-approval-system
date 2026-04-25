@@ -157,16 +157,16 @@ public function logout(Request $request)
 
 
 
-public function resetDatabase(Request $request)
+public function resetDatabase()
 {
    
 
-    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+   // ✅ PostgreSQL-safe reset
+    \Illuminate\Support\Facades\DB::table('requests')->truncate();
 
-    DB::table('requests')->truncate();
-    DB::table('users')->where('role', 'resident')->delete();
-
-    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+    \Illuminate\Support\Facades\DB::table('users')
+        ->where('role', 'resident')
+        ->delete();
 
     return back()->with('success', 'Database reset successfully');
 }
