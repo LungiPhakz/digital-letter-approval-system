@@ -32,11 +32,18 @@ COPY . .
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# ✅ FIX PERMISSIONS (VERY IMPORTANT)
+# ✅ Fix permissions
 RUN chmod -R 775 storage bootstrap/cache
+
+# ✅ Cache configs (BUILD TIME)
+# Cache during build (IMPORTANT)
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
+
 
 # Expose port
 EXPOSE 10000
 
-# Start app
-CMD ["sh", "-c", "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && php -S 0.0.0.0:10000 -t public"]
+# ✅ Runtime (FAST START)
+CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000"]
