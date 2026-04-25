@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\LetterRequest;
+use Illuminate\Support\Facades\Hash;
 
 class CouncilorController extends Controller
 {
@@ -175,4 +176,24 @@ public function destroy($id)
             'success' => true
         ]);
     }
+
+    public function updateCredentials(Request $request)
+{
+    $user = auth()->user();
+
+    $request->validate([
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'password' => 'nullable|min:6|confirmed'
+    ]);
+
+    $user->email = $request->email;
+
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
+    }
+
+    $user->save();
+
+    return back()->with('success', 'Account updated successfully');
+}
 }

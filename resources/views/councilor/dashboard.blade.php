@@ -595,10 +595,56 @@ if ($completed->count() > 0) {
          <p class="text-sm text-gray-600">Department</p>
          <p class="text-lg font-semibold text-gray-800">Community Services</p>
         </div>
-        <div>
-         <p class="text-sm text-gray-600">Access Level</p>
-         <p class="text-lg font-semibold"><span class="inline-block px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-bold">Full Access</span></p>
-        </div>
+        <div class="pt-4 border-t">
+  <p class="text-sm text-gray-600 mb-3">Account Settings</p>
+   
+  @if(session('success'))
+  <div class="mb-3 p-2 bg-green-100 text-green-700 rounded">
+    {{ session('success') }}
+  </div>
+@endif
+  <form method="POST" action="{{ route('councilor.update.credentials') }}" class="space-y-3">
+    @csrf
+
+    <!-- Email -->
+    <div>
+      <label class="text-sm text-gray-600">New Email</label>
+      <input 
+        type="email" 
+        name="email" 
+        value="{{ auth()->user()->email }}"
+        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
+        required>
+    </div>
+
+    <!-- Password -->
+    <div>
+      <label class="text-sm text-gray-600">New Password</label>
+      <input 
+        type="password" 
+        name="password" 
+        placeholder="Enter new password"
+        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
+    </div>
+
+    <!-- Confirm Password -->
+    <div>
+      <label class="text-sm text-gray-600">Confirm Password</label>
+      <input 
+        type="password" 
+        name="password_confirmation" 
+        placeholder="Confirm password"
+        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
+    </div>
+
+    <!-- Submit -->
+    <button 
+      type="submit"
+      class="w-full mt-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition">
+      Update Account
+    </button>
+  </form>
+</div>
        </div>
       </div><!-- Statistics Summary -->
       <div class="space-y-6">
@@ -1809,7 +1855,8 @@ function openDeleteConfirm(id) {
     const form = document.getElementById('deleteForm');
 
     // CHANGE THIS ROUTE to your actual delete route
-    form.action = `/councilor/request/delete/{id}`;
+    form.action = `/councilor/request/delete/${id}`;
+
 
     document.getElementById('delete-popup').classList.remove('hidden');
 }

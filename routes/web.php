@@ -63,7 +63,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/councilor/send/{id}', [CouncilorController::class, 'send'])
             ->name('councilor.send');
 
-    
+    Route::post('/councilor/update-credentials', [CouncilorController::class, 'updateCredentials'])
+    ->name('councilor.update.credentials');
 
             
 
