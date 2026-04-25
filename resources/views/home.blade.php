@@ -301,34 +301,6 @@
     section {
   overflow-x: hidden;
 }
-
-.sparkle {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  background: white;
-  border-radius: 50%;
-  opacity: 0.5;
-  animation: floatSparkle 6s infinite ease-in-out;
-}
-
-.sparkle:nth-child(1) { top: 20%; left: 10%; }
-.sparkle:nth-child(2) { top: 50%; left: 30%; animation-delay: 2s; }
-.sparkle:nth-child(3) { top: 70%; left: 60%; animation-delay: 4s; }
-.sparkle:nth-child(4) { top: 30%; left: 80%; animation-delay: 1s; }
-
-@keyframes floatSparkle {
-  0% { transform: translateY(0); opacity: 0.2; }
-  50% { transform: translateY(-20px); opacity: 0.8; }
-  100% { transform: translateY(0); opacity: 0.2; }
-}
-
-
-
-.grass-glow {
-  background: radial-gradient(circle at bottom, rgba(34,197,94,0.2), transparent 70%);
-}
-
   </style>
 
   <style>body { box-sizing: border-box; }</style>
@@ -353,16 +325,7 @@ Get Started
 </button>
      </div>
     </nav><!-- Hero Section - Storytelling -->
-    <section id="hero" class=" grass-glow w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white relative overflow-hidden flex items-center"><!-- Animated Background Elements -->
-
-     <!-- ✨ Sparkle Effect Layer (ADD THIS HERE) -->
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div class="sparkle"></div>
-    <div class="sparkle"></div>
-    <div class="sparkle"></div>
-    <div class="sparkle"></div>
-  </div>
-
+    <section id="hero" class="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white relative overflow-hidden flex items-center"><!-- Animated Background Elements -->
      <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
      <div class="absolute bottom-0 right-0 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 2s;"></div>
      <div class="max-w-7xl mx-auto px-6 relative z-10 py-20">
