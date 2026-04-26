@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\RequestController;
@@ -14,22 +15,33 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+
 // ================= ROLE SELECTION =================
 Route::get('/role', [ResidentController::class, 'roleSelection'])->name('role');
+
 
 // ================= LOGIN PAGES =================
 Route::get('/resident/login', fn() => view('resident.login'))->name('resident.login');
 Route::get('/councilor/login', fn() => view('councilor.login'))->name('councilor.login');
 
+
 // ================= LOGIN HANDLERS =================
-Route::post('/resident/login', [ResidentController::class, 'login'])->name('resident.login.post');
-Route::post('/councilor/login', [CouncilorController::class, 'login'])->name('councilor.login.post');
+Route::post('/resident/login', [ResidentController::class, 'login'])
+    ->name('resident.login.post');
 
-Route::get('/otp', [ResidentController::class, 'otpForm'])->name('otp.form');
-Route::post('/otp-verify', [ResidentController::class, 'verifyOtp'])->name('otp.verify');
+Route::post('/councilor/login', [CouncilorController::class, 'login'])
+    ->name('councilor.login.post');
 
 
+// ================= OTP ROUTES (VERY IMPORTANT) =================
+Route::get('/otp', [ResidentController::class, 'otpForm'])
+    ->name('otp.form');
 
+Route::post('/otp/verify', [ResidentController::class, 'verifyOtp'])
+    ->name('otp.verify');
+
+
+// ================= TEST EMAIL (OPTIONAL) =================
 Route::get('/test-mail', function () {
     Mail::raw('Hello OTP Test', function ($message) {
         $message->to('yourgmail@gmail.com')
@@ -38,7 +50,9 @@ Route::get('/test-mail', function () {
 
     return 'Email sent';
 });
-// ================= AUTH ROUTES =================
+
+
+// ================= AUTH PROTECTED =================
 Route::middleware(['auth'])->group(function () {
 
     // ================= RESIDENT =================
@@ -53,11 +67,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/resident/request-letter', [RequestController::class, 'store'])
             ->name('resident.request.store');
 
-            Route::post('/resident/request/{id}/cancel', [RequestController::class, 'cancel'])
-    ->name('resident.request.cancel');
-
-    
+        Route::post('/resident/request/{id}/cancel', [RequestController::class, 'cancel'])
+            ->name('resident.request.cancel');
     });
+
 
     // ================= COUNCILOR + ADMIN =================
     Route::middleware('role:councilor,admin')->group(function () {
@@ -77,18 +90,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/councilor/send/{id}', [CouncilorController::class, 'send'])
             ->name('councilor.send');
 
-    Route::post('/councilor/update-credentials', [CouncilorController::class, 'updateCredentials'])
-    ->name('councilor.update.credentials');
+        Route::post('/councilor/update-credentials', [CouncilorController::class, 'updateCredentials'])
+            ->name('councilor.update.credentials');
 
-            
-
-    Route::post('/councilor/request/delete/{id}', [CouncilorController::class, 'destroy'])
-    ->name('councilor.request.delete');
+        Route::post('/councilor/request/delete/{id}', [CouncilorController::class, 'destroy'])
+            ->name('councilor.request.delete');
     });
 
-    
 
-Route::get('/cleanup-cancelled', [AdminController::class, 'cleanupCancelled']);
     // ================= ADMIN =================
     Route::middleware('role:admin')->group(function () {
 
@@ -105,7 +114,13 @@ Route::get('/cleanup-cancelled', [AdminController::class, 'cleanupCancelled']);
             ->name('admin.reject');
     });
 
-    // ================= LOGOUT (GLOBAL - FIXED) =================
+
+    // ================= CLEANUP (ADMIN TOOL) =================
+    Route::get('/cleanup-cancelled', [AdminController::class, 'cleanupCancelled'])
+        ->name('cleanup.cancelled');
+
+
+    // ================= LOGOUT =================
     Route::post('/logout', function (Request $request) {
 
         Auth::logout();

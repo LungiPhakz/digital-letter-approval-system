@@ -1,272 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>CommunityLetters - Resident Login</title>
 
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com/3.4.17"></script>
-
-<!-- Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-
-<!-- PDF Generator -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-<!-- SDK -->
-
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-
-*{
-box-sizing:border-box;
-}
-
-body{
-font-family:'Inter',sans-serif;
-}
-
+body{font-family:'Inter',sans-serif;}
 .gradient-primary{
 background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+
+.otp-input {
+  width: 45px;
+  height: 50px;
+  text-align: center;
+  font-size: 20px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
 }
 
-.card-modern{
-background:white;
-border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,.08);
-transition:0.3s;
+.otp-input:focus {
+  border-color: #7c3aed;
+  outline: none;
 }
-
-.card-modern:hover{
-transform:translateY(-4px);
-box-shadow:0 15px 40px rgba(0,0,0,.12);
 }
-
 </style>
-
 </head>
 
 <body class="bg-gradient-to-br from-purple-50 via-blue-50 to-purple-100 min-h-screen flex items-center justify-center px-6">
 
-<div class="max-w-md w-full">
+<div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg">
 
-<div class="card-modern p-8">
+<h1 class="text-3xl font-bold text-center mb-6">Resident Login</h1>
 
-<!-- Header -->
-
-<div class="text-center mb-8">
-
-<div class="text-6xl mb-4 inline-block p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl">
-👤
+<!-- ✅ GLOBAL ERROR -->
+@if(session('error'))
+<div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+    {{ session('error') }}
 </div>
+@endif
 
-<h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">
-Resident Login
-</h1>
-
-<p class="text-gray-600 mt-2">
-Access your proof of residence requests
-</p>
-
-</div>
-
-<!-- Login Form -->
-
-<form method="POST" action="{{ route('resident.login.post') }}">
-
+<form id="loginForm" method="POST" action="{{ route('resident.login.post') }}">
 @csrf
 
-<!-- FULL NAME -->
-<div>
-  <input
-    type="text"
-    id="name"
-    name="name"
-    placeholder="Full Name"
-    required
-    class="w-full mb-1 p-3 border rounded-lg focus:outline-none"
-  />
-  <p id="name_error" class="text-sm text-red-600 hidden mb-3"></p>
-</div>
+<!-- NAME -->
+<input type="text" name="name" placeholder="Full Name"
+class="w-full mb-3 p-3 border rounded"
+value="{{ old('name') }}">
+@error('name')
+<p class="text-red-600 text-sm mb-2">{{ $message }}</p>
+@enderror
 
 <!-- EMAIL -->
-<div>
-  <input
-    type="email"
-    id="email"
-    name="email"
-    placeholder="Email Address"
-    required
-    class="w-full mb-1 p-3 border rounded-lg focus:outline-none"
-  />
-  <p id="email_error" class="text-sm text-red-600 hidden mb-3"></p>
-</div>
+<input type="email" name="email" placeholder="Email"
+class="w-full mb-3 p-3 border rounded"
+value="{{ old('email') }}">
+@error('email')
+<p class="text-red-600 text-sm mb-2">{{ $message }}</p>
+@enderror
 
 <!-- PHONE -->
-<div>
-  <input
-  type="tel"
-  id="phone"
-  name="phone"
-  placeholder="Phone Number (e.g. +27/0712345678)"
-  maxlength="10"
-  inputmode="numeric"
-  class="w-full mb-1 p-3 border rounded-lg focus:outline-none"
-/>
-<p id="phone_error" class="text-sm text-red-600 hidden mb-4"></p>
-</div>
+<input type="tel" name="phone" placeholder="+27821234567 or 0821234567"
+class="w-full mb-3 p-3 border rounded"
+value="{{ old('phone') }}">
+@error('phone')
+<p class="text-red-600 text-sm mb-2">{{ $message }}</p>
+@enderror
 
-<button
-type="submit"
-class="w-full py-3 gradient-primary text-white rounded-lg font-bold hover:shadow-lg transition"
->
-
+<button type="submit"
+class="w-full py-3 gradient-primary text-white rounded-lg font-bold">
 Login to Dashboard
-
 </button>
 
 </form>
 
-<!-- Back -->
-
-<div class="text-center mt-6">
-
-<a href="{{ route('role') }}" class="text-purple-600 font-semibold hover:text-purple-700">
-← Back to Role Selection
-</a>
-
 </div>
+<!-- OTP MODAL -->
+<div id="otpModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
 
+    <h2 class="text-2xl font-bold mb-2">Verify OTP</h2>
+    <p class="text-gray-500 mb-6">Enter the 6-digit code sent to you</p>
+
+    <!-- OTP INPUTS -->
+    <div class="flex justify-center gap-2 mb-4">
+      <input type="text" maxlength="1" class="otp-input" />
+      <input type="text" maxlength="1" class="otp-input" />
+      <input type="text" maxlength="1" class="otp-input" />
+      <input type="text" maxlength="1" class="otp-input" />
+      <input type="text" maxlength="1" class="otp-input" />
+      <input type="text" maxlength="1" class="otp-input" />
+    </div>
+
+    <!-- ERROR -->
+    <p id="otpError" class="text-red-500 text-sm hidden mb-3"></p>
+
+    <!-- VERIFY BUTTON -->
+    <button onclick="submitOTP()"
+      class="w-full py-3 bg-purple-600 text-white rounded-lg font-bold mb-3">
+      Verify OTP
+    </button>
+
+    <!-- RESEND -->
+    <button id="resendBtn" onclick="resendOTP()"
+      class="text-sm text-purple-600 font-semibold hidden">
+      Resend OTP
+    </button>
+
+    <p id="timerText" class="text-sm text-gray-400"></p>
+
+  </div>
 </div>
-
-</div>
-
 
 <script>
-// ===== FULL NAME VALIDATION =====
-function validateFullName(name) {
-    const parts = name.trim().split(/\s+/);
-    if (parts.length < 2) {
-        return "Please enter your full name (name and surname).";
+const inputs = document.querySelectorAll(".otp-input");
+
+// AUTO MOVE
+inputs.forEach((input, index) => {
+  input.addEventListener("input", (e) => {
+    if (e.target.value.length === 1 && index < inputs.length - 1) {
+      inputs[index + 1].focus();
     }
-    return null;
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" && !input.value && index > 0) {
+      inputs[index - 1].focus();
+    }
+  });
+});
+
+// OPEN MODAL (call this after login success)
+function openOtpModal() {
+  document.getElementById("otpModal").classList.remove("hidden");
+  startTimer();
+  inputs[0].focus();
 }
 
-// ===== EMAIL VALIDATION =====
-function validateEmail(email) {
-    const pattern = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-    if (!pattern.test(email)) {
-        return "Enter a valid email address.";
+// SUBMIT OTP
+function submitOTP() {
+  let otp = "";
+  inputs.forEach(input => otp += input.value);
+
+  if (otp.length !== 6) {
+    showError("Enter complete OTP");
+    return;
+  }
+
+  fetch("{{ route('otp.verify') }}", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF-TOKEN": "{{ csrf_token() }}"
+    },
+    body: JSON.stringify({ otp: otp })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      window.location.href = data.redirect;
+    } else {
+      showError(data.message);
     }
-    return null;
+  });
 }
 
-// ===== SA PHONE VALIDATION =====
-function validatePhone(phone) {
-    const clean = phone.replace(/\D/g, ''); // remove anything not number
-
-    if (clean.length === 0) return "Phone number is required.";
-
-    if (!/^(\+27|0)[6-8][0-9]{8}$/.test(phone)) {
-        return "Enter valid SA number (0821234567 or +27821234567).";
-    }
-
-    return null;
+// ERROR DISPLAY
+function showError(msg) {
+  const err = document.getElementById("otpError");
+  err.textContent = msg;
+  err.classList.remove("hidden");
 }
 
+// TIMER
+let timeLeft = 30;
+function startTimer() {
+  const timer = document.getElementById("timerText");
+  const resendBtn = document.getElementById("resendBtn");
 
-// ===== ELEMENTS =====
-const nameInput = document.getElementById("name");
-const emailInput = document.getElementById("email");
-const phoneInput = document.getElementById("phone");
+  resendBtn.classList.add("hidden");
 
-// ===== ERROR ELEMENTS =====
-const nameError = document.getElementById("name_error");
-const emailError = document.getElementById("email_error");
-const phoneError = document.getElementById("phone_error");
+  const interval = setInterval(() => {
+    timeLeft--;
+    timer.textContent = `Resend in ${timeLeft}s`;
 
-// ===== LIVE VALIDATION =====
-nameInput.addEventListener("input", () => {
-    const error = validateFullName(nameInput.value);
+    if (timeLeft <= 0) {
+      clearInterval(interval);
+      timer.textContent = "";
+      resendBtn.classList.remove("hidden");
+    }
+  }, 1000);
+}
 
-    if (error) {
-        nameError.textContent = error;
-        nameError.classList.remove("hidden");
-        nameInput.classList.add("border-red-500");
+// RESEND OTP
+function resendOTP() {
+  fetch("/resend-otp", { method: "POST",
+    headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
+  });
+
+  timeLeft = 30;
+  startTimer();
+}
+</script>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+
+  fetch("{{ route('resident.login.post') }}", {
+    method: "POST",
+    headers: {
+      "X-CSRF-TOKEN": "{{ csrf_token() }}"
+    },
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      openOtpModal();
     } else {
-        nameError.classList.add("hidden");
-        nameInput.classList.remove("border-red-500");
-        nameInput.classList.add("border-green-500");
+      alert("Login failed");
     }
-});
-
-emailInput.addEventListener("input", () => {
-    const error = validateEmail(emailInput.value);
-
-    if (error) {
-        emailError.textContent = error;
-        emailError.classList.remove("hidden");
-        emailInput.classList.add("border-red-500");
-    } else {
-        emailError.classList.add("hidden");
-        emailInput.classList.remove("border-red-500");
-        emailInput.classList.add("border-green-500");
-    }
-});
-
-phoneInput.addEventListener("input", () => {
-    const error = validatePhone(phoneInput.value);
-
-    if (error) {
-        phoneError.textContent = error;
-        phoneError.classList.remove("hidden");
-        phoneInput.classList.add("border-red-500");
-        phoneInput.classList.remove("border-green-500");
-    } else {
-        phoneError.classList.add("hidden");
-        phoneInput.classList.remove("border-red-500");
-        phoneInput.classList.add("border-green-500");
-    }
-});
-
-phoneInput.addEventListener("keypress", function(e) {
-    if (!/[0-9]/.test(e.key)) {
-        e.preventDefault();
-    }
-});
-
-// ===== FORM SUBMIT VALIDATION =====
-document.querySelector("form").addEventListener("submit", function(e) {
-
-    const nameErr = validateFullName(nameInput.value);
-    const emailErr = validateEmail(emailInput.value);
-    const phoneErr = validatePhone(phoneInput.value);
-
-    if (nameErr || emailErr || phoneErr) {
-        e.preventDefault();
-
-        if (nameErr) {
-            nameError.textContent = nameErr;
-            nameError.classList.remove("hidden");
-            nameInput.classList.add("border-red-500");
-        }
-
-        if (emailErr) {
-            emailError.textContent = emailErr;
-            emailError.classList.remove("hidden");
-            emailInput.classList.add("border-red-500");
-        }
-
-        if (phoneErr) {
-            phoneError.textContent = phoneErr;
-            phoneError.classList.remove("hidden");
-            phoneInput.classList.add("border-red-500");
-        }
-    }
+  });
 });
 </script>
 </body>
