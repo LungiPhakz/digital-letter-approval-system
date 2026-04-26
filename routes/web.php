@@ -25,7 +25,19 @@ Route::get('/councilor/login', fn() => view('councilor.login'))->name('councilor
 Route::post('/resident/login', [ResidentController::class, 'login'])->name('resident.login.post');
 Route::post('/councilor/login', [CouncilorController::class, 'login'])->name('councilor.login.post');
 
+Route::get('/otp', [ResidentController::class, 'otpForm'])->name('otp.form');
+Route::post('/otp-verify', [ResidentController::class, 'verifyOtp'])->name('otp.verify');
 
+
+
+Route::get('/test-mail', function () {
+    Mail::raw('Hello OTP Test', function ($message) {
+        $message->to('yourgmail@gmail.com')
+                ->subject('Test Email');
+    });
+
+    return 'Email sent';
+});
 // ================= AUTH ROUTES =================
 Route::middleware(['auth'])->group(function () {
 

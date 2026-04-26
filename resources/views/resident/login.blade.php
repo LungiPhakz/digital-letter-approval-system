@@ -112,7 +112,7 @@ Access your proof of residence requests
   type="tel"
   id="phone"
   name="phone"
-  placeholder="Phone Number (e.g. 0712345678)"
+  placeholder="Phone Number (e.g. +27/0712345678)"
   maxlength="10"
   inputmode="numeric"
   class="w-full mb-1 p-3 border rounded-lg focus:outline-none"
@@ -170,14 +170,6 @@ function validatePhone(phone) {
     const clean = phone.replace(/\D/g, ''); // remove anything not number
 
     if (clean.length === 0) return "Phone number is required.";
-
-    if (!/^\d+$/.test(phone)) {
-        return "Only numbers are allowed.";
-    }
-
-    if (clean.length !== 10) {
-        return "Phone number must be exactly 10 digits.";
-    }
 
     if (!/^(\+27|0)[6-8][0-9]{8}$/.test(phone)) {
         return "Enter valid SA number (0821234567 or +27821234567).";
