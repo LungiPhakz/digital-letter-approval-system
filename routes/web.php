@@ -44,8 +44,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/resident/request/{id}/cancel', [RequestController::class, 'cancel'])
     ->name('resident.request.cancel');
 
-    Route::delete('/resident/request/{id}', [ResidentController::class, 'destroy'])
-    ->name('resident.request.destroy');
+    
     });
 
     // ================= COUNCILOR + ADMIN =================
