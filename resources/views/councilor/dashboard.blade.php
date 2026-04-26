@@ -1490,25 +1490,27 @@ if (request.status === 'Approved') {
             </span>
         </td>
 
-        <td class="px-6 py-4 text-gray-700">
-            ${formatDate(request.created_at)}
-        </td>
+       @foreach($requests as $request)
+<tr>
 
-        <td class="px-6 py-4 text-gray-700 font-semibold">
-            ${days}
-        </td>
-        <td class="px-6 py-4">
-<form method="POST" action="{{ route('resident.request.destroy', $request->id) }}">
-    @csrf
-    @method('DELETE')
+    <td>{{ $request->reference_number }}</td>
+    <td>{{ $request->letter_type }}</td>
 
-    <button type="submit"
-        class="text-red-600 font-semibold hover:underline">
-        Delete
-    </button>
-</form>
+    <td>
+        <form method="POST" action="{{ route('resident.request.destroy', $request->id) }}">
+            @csrf
+            @method('DELETE')
 
-</td>
+            <button type="submit"
+                class="text-red-600 font-semibold hover:underline"
+                onclick="return confirm('Are you sure you want to delete this request?')">
+                Delete
+            </button>
+        </form>
+    </td>
+
+</tr>
+@endforeach
       </tr>
     `;
 }).join('');
