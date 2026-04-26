@@ -55,7 +55,7 @@ body{
 <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
     {{ session('error') }}
 </div>
-@endif
+
 
 <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
     {{ session('error') }}
