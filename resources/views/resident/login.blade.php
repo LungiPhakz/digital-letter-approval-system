@@ -57,6 +57,10 @@ body{
 </div>
 @endif
 
+<div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+    {{ session('error') }}
+</div>
+@endif
 <form id="loginForm" method="POST" action="{{ route('resident.login.post') }}">
 @csrf
 
@@ -222,44 +226,64 @@ function resendOTP() {
     headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
   });
 
+  let timeLeft = 30;
+let interval;
+  function startTimer() {
+  const timer = document.getElementById("timerText");
+  const resendBtn = document.getElementById("resendBtn");
+
+  resendBtn.classList.add("hidden");
   timeLeft = 30;
-  startTimer();
+
+  clearInterval(interval);
+
+  interval = setInterval(() => {
+    timeLeft--;
+    timer.textContent = `Resend in ${timeLeft}s`;
+
+    if (timeLeft <= 0) {
+      clearInterval(interval);
+      timer.textContent = "";
+      resendBtn.classList.remove("hidden");
+    }
+  }, 1000);
 }
 </script>
 
+
 <script>
 document.getElementById("loginForm").addEventListener("submit", function(e) {
-  
+  e.preventDefault();
 
   const formData = new FormData(this);
 
- fetch("{{ route('resident.login.post') }}", {
-  method: "POST",
-  headers: {
-    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-    "Accept": "application/json" // ✅ ADD THIS
-  },
-  body: formData
-})
-.then(async res => {
-  if (!res.ok) {
+  fetch("{{ route('resident.login.post') }}", {
+    method: "POST",
+    headers: {
+      "X-CSRF-TOKEN": "{{ csrf_token() }}",
+      "Accept": "application/json"
+    },
+    body: formData
+  })
+  .then(async res => {
     const data = await res.json();
 
-    if (data.errors) {
-      let messages = Object.values(data.errors).flat().join("\n");
-      alert(messages); // or show nicely in UI
+    if (!res.ok || !data.success) {
+      alert(data.message || "Login failed");
+      return;
     }
-    return;
-  }
 
-  return res.json();
-})
-.then(data => {
-  if (data && data.success) {
+    // ✅ SHOW OTP MODAL
     openOtpModal();
-  }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Server error");
+  });
 });
-});
+
+
+
 </script>
 </body>
 </html>

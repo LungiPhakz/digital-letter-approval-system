@@ -29,73 +29,67 @@ class ResidentController extends Controller
 
     // ================= LOGIN =================
     public function login(Request $request)
-    {
-        $request->validate([
-            'name' => ['required','string','min:5','regex:/^\w+\s+\w+/'],
-            'email' => 'required|email',
-            'phone' => ['required','regex:/^(\+27|0)[6-8][0-9]{8}$/'],
-        ], [
-            'name.regex' => 'Enter full name (name & surname)',
-            'phone.regex' => 'Use valid SA number (082... or +2782...)'
+{
+    $request->validate([
+        'name' => ['required','string','min:5','regex:/^\w+\s+\w+/'],
+        'email' => 'required|email',
+        'phone' => ['required','regex:/^(\+27|0)[6-8][0-9]{8}$/'],
+    ]);
+
+    // 🔧 FORMAT PHONE ONCE
+    $phone = $this->formatPhone($request->phone);
+
+    // 🔍 FIND USER
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+
+        // CREATE USER
+        $user = User::create([
+            'name' => trim($request->name),
+            'email' => $request->email,
+            'phone' => $phone,
+            'password' => Hash::make('password'),
+            'role' => 'resident'
         ]);
 
-        $formattedPhone = $this->formatPhone($request->phone);
+    } else {
 
-        // 🔍 Find user
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            $user = User::create([
-                'name' => trim($request->name),
-                'email' => $request->email,
-                'phone' => $formattedPhone,
-                'password' => Hash::make('password'),
-                'role' => 'resident'
-            ]);
-        } else {
-            // ✅ Compare with formatted phone
-            if ($user->phone !== $formattedPhone) {
-               return response()->json([
-    'success' => false,
-    'message' => 'Phone number does not match this account.'
-], 422);
-            }
+        // ✅ FIXED COMPARISON (IMPORTANT)
+        if ($user->phone !== $phone) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Phone number does not match this account.'
+            ], 422);
         }
-
-        // ================= OTP =================
-        $otp = (string) rand(100000, 999999);
-
-        $user->update([
-            'otp_code' => $otp,
-            'otp_expires_at' => now()->addMinutes(5)
-        ]);
-
-        // 📧 EMAIL
-        try {
-            Mail::raw("Your OTP is: $otp", function ($message) use ($user) {
-                $message->to($user->email)
-                    ->subject('OTP Verification');
-            });
-        } catch (\Exception $e) {
-            // email failed silently
-        }
-
-        // 📱 SMS (safe fallback)
-        try {
-            Http::post('https://your-sms-api.com/send', [
-                'to' => $user->phone,
-                'message' => "Your OTP is $otp"
-            ]);
-        } catch (\Exception $e) {
-            // SMS failed silently
-        }
-
-        session(['otp_user_id' => $user->id]);
-
-        return response()->json([
-    'success' => true
-]);
     }
+
+    // ================= OTP =================
+    $otp = rand(100000, 999999);
+
+    $user->update([
+        'otp_code' => $otp,
+        'otp_expires_at' => now()->addMinutes(5)
+    ]);
+
+    // 📧 EMAIL OTP
+    Mail::raw("Your OTP is: $otp", function ($message) use ($user) {
+        $message->to($user->email)
+            ->subject('CommunityLetters OTP');
+    });
+
+    // 📱 SMS OTP (Termii / Twilio etc)
+    Http::post('https://your-sms-api.com/send', [
+        'to' => $user->phone,
+        'message' => "Your OTP is $otp"
+    ]);
+
+    session(['otp_user_id' => $user->id]);
+
+    return response()->json([
+        'success' => true
+    ]);
+}
 
     // ================= OTP VERIFY =================
     public function verifyOtp(Request $request)
