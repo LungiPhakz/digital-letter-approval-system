@@ -196,4 +196,10 @@ public function destroy($id)
 
     return back()->with('success', 'Account updated successfully');
 }
+public function cleanupCancelled()
+{
+    LetterRequest::where('status', 'Cancelled')->delete();
+
+    return back()->with('success', 'Cancelled requests deleted successfully');
+}
 }

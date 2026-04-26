@@ -1498,13 +1498,15 @@ if (request.status === 'Approved') {
             ${days}
         </td>
         <td class="px-6 py-4">
+<form method="POST" action="{{ route('resident.request.destroy', $request->id) }}">
+    @csrf
+    @method('DELETE')
 
-    <button 
-        type="button"
-        onclick="openDeleteConfirm({{ $request->id }})"
+    <button type="submit"
         class="text-red-600 font-semibold hover:underline">
         Delete
     </button>
+</form>
 
 </td>
       </tr>

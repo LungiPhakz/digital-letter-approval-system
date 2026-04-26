@@ -72,4 +72,12 @@ class RequestController extends Controller
 
     return back()->with('success', 'Request cancelled and removed successfully');
 }
+public function destroy($id)
+{
+    $request = LetterRequest::findOrFail($id);
+
+    $request->delete();
+
+    return back()->with('success', 'Request deleted successfully');
+}
 }

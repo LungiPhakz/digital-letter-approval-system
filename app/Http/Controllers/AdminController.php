@@ -50,5 +50,11 @@ $request->save();
 return back();
 
 }
+public function cleanupCancelled()
+{
+    LetterRequest::where('status', 'Cancelled')->delete();
+
+    return back()->with('success', 'Cancelled requests deleted successfully');
+}
 
 }
