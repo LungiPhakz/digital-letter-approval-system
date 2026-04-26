@@ -503,8 +503,7 @@ Get Started
        </div>
        <div class="animate-fade-in" style="animation-delay: 0.1s;">
         <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-         {{ \App\Models\User::where('role','resident')->count() }}+
-        </div>
+         {{ \App\Models\User::where('role', 'resident')->distinct('email')->count('email') }}+
         <p class="text-gray-600 mt-2">Registered Residents</p>
        </div>
        <div class="animate-fade-in" style="animation-delay: 0.2s;">
