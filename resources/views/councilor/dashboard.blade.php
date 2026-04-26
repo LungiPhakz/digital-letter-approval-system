@@ -595,55 +595,14 @@ if ($completed->count() > 0) {
          <p class="text-sm text-gray-600">Department</p>
          <p class="text-lg font-semibold text-gray-800">Community Services</p>
         </div>
-        <div class="pt-4 border-t">
-  <p class="text-sm text-gray-600 mb-3">Account Settings</p>
-   
-  @if(session('success'))
-  <div class="mb-3 p-2 bg-green-100 text-green-700 rounded">
-    {{ session('success') }}
-  </div>
-@endif
-  <form method="POST" action="{{ route('councilor.update.credentials') }}" class="space-y-3">
-    @csrf
+        <div>
+  <p class="text-sm text-gray-600">Account Settings</p>
 
-    <!-- Email -->
-    <div>
-      <label class="text-sm text-gray-600">New Email</label>
-      <input 
-        type="email" 
-        name="email" 
-        value="{{ auth()->user()->email }}"
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
-        required>
-    </div>
-
-    <!-- Password -->
-    <div>
-      <label class="text-sm text-gray-600">New Password</label>
-      <input 
-        type="password" 
-        name="password" 
-        placeholder="Enter new password"
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
-    </div>
-
-    <!-- Confirm Password -->
-    <div>
-      <label class="text-sm text-gray-600">Confirm Password</label>
-      <input 
-        type="password" 
-        name="password_confirmation" 
-        placeholder="Confirm password"
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
-    </div>
-
-    <!-- Submit -->
-    <button 
-      type="submit"
-      class="w-full mt-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition">
-      Update Account
-    </button>
-  </form>
+  <button 
+    onclick="openAccountModal()"
+    class="mt-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition">
+    Update Email / Password
+  </button>
 </div>
        </div>
       </div><!-- Statistics Summary -->
@@ -876,6 +835,67 @@ if ($completed->count() > 0) {
 
     </div>
 
+  </div>
+</div>
+
+<div id="account-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl animate-scale-in">
+
+    <!-- Header -->
+    <div class="bg-purple-600 text-white px-6 py-4 rounded-t-2xl">
+      <h2 class="text-lg font-bold">Update Account</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6">
+
+      <form method="POST" action="{{ route('councilor.update.credentials') }}" class="space-y-3">
+        @csrf
+
+        <div>
+          <label class="text-sm text-gray-600">New Email</label>
+          <input 
+            type="email" 
+            name="email" 
+            value="{{ auth()->user()->email }}"
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
+            required>
+        </div>
+
+        <div>
+          <label class="text-sm text-gray-600">New Password</label>
+          <input 
+            type="password" 
+            name="password"
+            class="w-full px-3 py-2 border rounded-lg">
+        </div>
+
+        <div>
+          <label class="text-sm text-gray-600">Confirm Password</label>
+          <input 
+            type="password" 
+            name="password_confirmation"
+            class="w-full px-3 py-2 border rounded-lg">
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-2 pt-3">
+          <button type="button"
+            onclick="closeAccountModal()"
+            class="flex-1 px-4 py-2 border rounded-lg">
+            Cancel
+          </button>
+
+          <button type="submit"
+            class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg">
+            Update
+          </button>
+        </div>
+
+      </form>
+
+    </div>
   </div>
 </div>
 
@@ -1863,6 +1883,14 @@ function openDeleteConfirm(id) {
 
 function closeDeleteConfirm() {
     document.getElementById('delete-popup').classList.add('hidden');
+}
+
+function openAccountModal() {
+    document.getElementById('account-modal').classList.remove('hidden');
+}
+
+function closeAccountModal() {
+    document.getElementById('account-modal').classList.add('hidden');
 }
 </script>
 

@@ -209,22 +209,22 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
     <!-- Footer -->
     <div class="flex gap-3 p-6 pt-0">
 
-      <button 
-        onclick="closeCancelModal()"
-        class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-100 transition">
-        No, Keep It
-      </button>
+  <button 
+    onclick="closeCancelModal()"
+    class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-100 transition">
+    No, Keep It
+  </button>
 
-      <form id="cancelForm" method="POST" class="flex-1">
-        @csrf
-        <button 
-          type="submit"
-          class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
-          Yes, Cancel
-        </button>
-      </form>
+  <form id="cancelForm" method="POST" class="flex-1">
+    @csrf
+    <button 
+      type="submit"
+      class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
+      Yes, Cancel
+    </button>
+  </form>
 
-    </div>
+</div>
 
   </div>
 </div>

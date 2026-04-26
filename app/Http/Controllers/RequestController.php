@@ -53,22 +53,23 @@ class RequestController extends Controller
          
     }
 
-    public function cancel($id)
+ public function cancel($id)
 {
     $request = LetterRequest::findOrFail($id);
 
+    // user can only cancel their own request
     if ($request->user_id !== auth()->id()) {
         abort(403);
     }
 
-    // Only allow cancel if still pending
+    // only pending allowed
     if ($request->status !== 'Pending') {
         return back()->with('error', 'Only pending requests can be cancelled');
     }
 
-    $request->status = 'Cancelled';
-    $request->save();
+    // ✅ PERMANENT DELETE
+    $request->delete(); // or forceDelete() if using SoftDeletes
 
-    return back()->with('success', 'Request cancelled successfully');
+    return back()->with('success', 'Request cancelled and removed successfully');
 }
 }
