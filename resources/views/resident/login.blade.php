@@ -9,10 +9,21 @@
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-body{font-family:'Inter',sans-serif;}
+*{ 
+    box-sizing:border-box; 
+} 
+body{
+     font-family:'Inter',sans-serif; 
+    } 
 .gradient-primary{
-background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-
+     background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); 
+} 
+.card-modern{ 
+    background:white; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.08); transition:0.3s; 
+} 
+.card-modern:hover{ 
+    transform:translateY(-4px); box-shadow:0 15px 40px rgba(0,0,0,.12); 
+}
 .otp-input {
   width: 45px;
   height: 50px;
@@ -26,7 +37,7 @@ background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
   border-color: #7c3aed;
   outline: none;
 }
-}
+
 </style>
 </head>
 
@@ -154,21 +165,28 @@ function submitOTP() {
   }
 
   fetch("{{ route('otp.verify') }}", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-TOKEN": "{{ csrf_token() }}"
-    },
-    body: JSON.stringify({ otp: otp })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      window.location.href = data.redirect;
-    } else {
-      showError(data.message);
-    }
-  });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+    "Accept": "application/json" // ✅ ADD
+  },
+  body: JSON.stringify({ otp: otp })
+})
+.then(async res => {
+  if (!res.ok) {
+    const data = await res.json();
+    showError(data.message || "Invalid OTP");
+    return;
+  }
+
+  return res.json();
+})
+.then(data => {
+  if (data && data.success) {
+    window.location.href = data.redirect;
+  }
+});
 }
 
 // ERROR DISPLAY
@@ -215,21 +233,32 @@ document.getElementById("loginForm").addEventListener("submit", function(e) {
 
   const formData = new FormData(this);
 
-  fetch("{{ route('resident.login.post') }}", {
-    method: "POST",
-    headers: {
-      "X-CSRF-TOKEN": "{{ csrf_token() }}"
-    },
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      openOtpModal();
-    } else {
-      alert("Login failed");
+ fetch("{{ route('resident.login.post') }}", {
+  method: "POST",
+  headers: {
+    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+    "Accept": "application/json" // ✅ ADD THIS
+  },
+  body: formData
+})
+.then(async res => {
+  if (!res.ok) {
+    const data = await res.json();
+
+    if (data.errors) {
+      let messages = Object.values(data.errors).flat().join("\n");
+      alert(messages); // or show nicely in UI
     }
-  });
+    return;
+  }
+
+  return res.json();
+})
+.then(data => {
+  if (data && data.success) {
+    openOtpModal();
+  }
+});
 });
 </script>
 </body>

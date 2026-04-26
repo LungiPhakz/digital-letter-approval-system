@@ -55,7 +55,10 @@ class ResidentController extends Controller
         } else {
             // ✅ Compare with formatted phone
             if ($user->phone !== $formattedPhone) {
-                return back()->with('error', 'Phone number does not match this account.');
+               return response()->json([
+    'success' => false,
+    'message' => 'Phone number does not match this account.'
+], 422);
             }
         }
 
@@ -111,7 +114,10 @@ class ResidentController extends Controller
             $user->otp_code !== $request->otp ||
             now()->gt($user->otp_expires_at)
         ) {
-            return back()->with('error', 'Invalid or expired OTP');
+            return response()->json([
+    'success' => false,
+    'message' => 'Invalid or expired OTP'
+], 422);
         }
 
         // ✅ clear
