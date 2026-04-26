@@ -32,7 +32,10 @@ background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
 
 <body class="bg-gradient-to-br from-purple-50 via-blue-50 to-purple-100 min-h-screen flex items-center justify-center px-6">
 
-<div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg">
+<div class="max-w-md w-full"> 
+    <div class="card-modern p-8"> <!-- Header --> 
+        <div class="text-center mb-8"> 
+    <div class="text-6xl mb-4 inline-block p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl"> 👤 </div>
 
 <h1 class="text-3xl font-bold text-center mb-6">Resident Login</h1>
 
