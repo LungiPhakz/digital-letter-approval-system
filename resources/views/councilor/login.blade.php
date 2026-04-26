@@ -78,6 +78,12 @@ Administrative access to manage requests
 
 <!-- Login Form -->
 
+@if(session('error'))
+    <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+        {{ session('error') }}
+    </div>
+@endif
+
 <form method="POST" action="{{ route('councilor.login.post') }}">
 
 @csrf
@@ -119,11 +125,7 @@ Login to Dashboard
 
 </div>
 
-@if(session('error'))
-<script>
-    showToast("{{ session('error') }}", "error");
-</script>
-@endif
+
 
 </div>
 

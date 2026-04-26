@@ -80,29 +80,45 @@ Access your proof of residence requests
 
 @csrf
 
-<input
-type="text"
-name="name"
-placeholder="Full Name"
-required
-class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:border-purple-500"
-/>
+<!-- FULL NAME -->
+<div>
+  <input
+    type="text"
+    id="name"
+    name="name"
+    placeholder="Full Name"
+    required
+    class="w-full mb-1 p-3 border rounded-lg focus:outline-none"
+  />
+  <p id="name_error" class="text-sm text-red-600 hidden mb-3"></p>
+</div>
 
-<input
-type="email"
-name="email"
-placeholder="Email Address"
-required
-class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:border-purple-500"
-/>
+<!-- EMAIL -->
+<div>
+  <input
+    type="email"
+    id="email"
+    name="email"
+    placeholder="Email Address"
+    required
+    class="w-full mb-1 p-3 border rounded-lg focus:outline-none"
+  />
+  <p id="email_error" class="text-sm text-red-600 hidden mb-3"></p>
+</div>
 
-<input
-type="tel"
-name="phone"
-placeholder="Phone Number"
-required
-class="w-full mb-6 p-3 border rounded-lg focus:outline-none focus:border-purple-500"
+<!-- PHONE -->
+<div>
+  <input
+  type="tel"
+  id="phone"
+  name="phone"
+  placeholder="Phone Number (e.g. 0712345678)"
+  maxlength="10"
+  inputmode="numeric"
+  class="w-full mb-1 p-3 border rounded-lg focus:outline-none"
 />
+<p id="phone_error" class="text-sm text-red-600 hidden mb-4"></p>
+</div>
 
 <button
 type="submit"
@@ -129,5 +145,137 @@ Login to Dashboard
 
 </div>
 
+
+<script>
+// ===== FULL NAME VALIDATION =====
+function validateFullName(name) {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length < 2) {
+        return "Please enter your full name (name and surname).";
+    }
+    return null;
+}
+
+// ===== EMAIL VALIDATION =====
+function validateEmail(email) {
+    const pattern = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+    if (!pattern.test(email)) {
+        return "Enter a valid email address.";
+    }
+    return null;
+}
+
+// ===== SA PHONE VALIDATION =====
+function validatePhone(phone) {
+    const clean = phone.replace(/\D/g, ''); // remove anything not number
+
+    if (clean.length === 0) return "Phone number is required.";
+
+    if (!/^\d+$/.test(phone)) {
+        return "Only numbers are allowed.";
+    }
+
+    if (clean.length !== 10) {
+        return "Phone number must be exactly 10 digits.";
+    }
+
+    if (!/^(\+27|0)[6-8][0-9]{8}$/.test(phone)) {
+        return "Enter valid SA number (0821234567 or +27821234567).";
+    }
+
+    return null;
+}
+
+
+// ===== ELEMENTS =====
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const phoneInput = document.getElementById("phone");
+
+// ===== ERROR ELEMENTS =====
+const nameError = document.getElementById("name_error");
+const emailError = document.getElementById("email_error");
+const phoneError = document.getElementById("phone_error");
+
+// ===== LIVE VALIDATION =====
+nameInput.addEventListener("input", () => {
+    const error = validateFullName(nameInput.value);
+
+    if (error) {
+        nameError.textContent = error;
+        nameError.classList.remove("hidden");
+        nameInput.classList.add("border-red-500");
+    } else {
+        nameError.classList.add("hidden");
+        nameInput.classList.remove("border-red-500");
+        nameInput.classList.add("border-green-500");
+    }
+});
+
+emailInput.addEventListener("input", () => {
+    const error = validateEmail(emailInput.value);
+
+    if (error) {
+        emailError.textContent = error;
+        emailError.classList.remove("hidden");
+        emailInput.classList.add("border-red-500");
+    } else {
+        emailError.classList.add("hidden");
+        emailInput.classList.remove("border-red-500");
+        emailInput.classList.add("border-green-500");
+    }
+});
+
+phoneInput.addEventListener("input", () => {
+    const error = validatePhone(phoneInput.value);
+
+    if (error) {
+        phoneError.textContent = error;
+        phoneError.classList.remove("hidden");
+        phoneInput.classList.add("border-red-500");
+        phoneInput.classList.remove("border-green-500");
+    } else {
+        phoneError.classList.add("hidden");
+        phoneInput.classList.remove("border-red-500");
+        phoneInput.classList.add("border-green-500");
+    }
+});
+
+phoneInput.addEventListener("keypress", function(e) {
+    if (!/[0-9]/.test(e.key)) {
+        e.preventDefault();
+    }
+});
+
+// ===== FORM SUBMIT VALIDATION =====
+document.querySelector("form").addEventListener("submit", function(e) {
+
+    const nameErr = validateFullName(nameInput.value);
+    const emailErr = validateEmail(emailInput.value);
+    const phoneErr = validatePhone(phoneInput.value);
+
+    if (nameErr || emailErr || phoneErr) {
+        e.preventDefault();
+
+        if (nameErr) {
+            nameError.textContent = nameErr;
+            nameError.classList.remove("hidden");
+            nameInput.classList.add("border-red-500");
+        }
+
+        if (emailErr) {
+            emailError.textContent = emailErr;
+            emailError.classList.remove("hidden");
+            emailInput.classList.add("border-red-500");
+        }
+
+        if (phoneErr) {
+            phoneError.textContent = phoneErr;
+            phoneError.classList.remove("hidden");
+            phoneInput.classList.add("border-red-500");
+        }
+    }
+});
+</script>
 </body>
 </html>
