@@ -8,15 +8,16 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Http;
 
 class ResidentController extends Controller
 {
+    // ================= ROLE =================
     public function roleSelection()
     {
         return view('role');
     }
 
+    // ================= LOGOUT =================
     public function logout(Request $request)
     {
         Auth::logout();
@@ -27,71 +28,62 @@ class ResidentController extends Controller
         return redirect()->route('home');
     }
 
-    // ================= LOGIN =================
+    // ================= LOGIN (EMAIL ONLY OTP) =================
     public function login(Request $request)
-{
-    $request->validate([
-        'name' => ['required','string','min:5','regex:/^\w+\s+\w+/'],
-        'email' => 'required|email',
-        'phone' => ['required','regex:/^(\+27|0)[6-8][0-9]{8}$/'],
-    ]);
-
-    // 🔧 FORMAT PHONE ONCE
-    $phone = $this->formatPhone($request->phone);
-
-    // 🔍 FIND USER
-    $user = User::where('email', $request->email)->first();
-
-    if (!$user) {
-
-        // CREATE USER
-        $user = User::create([
-            'name' => trim($request->name),
-            'email' => $request->email,
-            'phone' => $phone,
-            'password' => Hash::make('password'),
-            'role' => 'resident'
+    {
+        $request->validate([
+            'name'  => ['required','string','min:5','regex:/^\w+\s+\w+/'],
+            'email' => 'required|email',
+            'phone' => ['required','regex:/^(\+27|0)[6-8][0-9]{8}$/'],
         ]);
 
-    } else {
+        $phone = $this->formatPhone($request->phone);
 
-        // ✅ FIXED COMPARISON (IMPORTANT)
-        if ($user->phone !== $phone) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Phone number does not match this account.'
-            ], 422);
+        // 🔍 Find user ONLY by email
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            // CREATE NEW USER
+            $user = User::create([
+                'name' => trim($request->name),
+                'email' => $request->email,
+                'phone' => $phone,
+                'password' => Hash::make('password'),
+                'role' => 'resident'
+            ]);
+        } else {
+            // OPTIONAL: update phone + name (NO verification anymore)
+            $user->update([
+                'name' => trim($request->name),
+                'phone' => $phone,
+            ]);
         }
+
+        // ================= OTP =================
+        $otp = rand(100000, 999999);
+
+        $user->update([
+            'otp_code' => $otp,
+            'otp_expires_at' => now()->addMinutes(5)
+        ]);
+
+        // 📧 EMAIL OTP ONLY
+        Mail::raw(
+            "CommunityLetters: Your OTP code is $otp. It expires in 5 minutes.",
+            function ($message) use ($user) {
+                $message->to($user->email)
+                        ->subject('CommunityLetters OTP Verification');
+            }
+        );
+
+        session(['otp_user_id' => $user->id]);
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 
-    // ================= OTP =================
-    $otp = rand(100000, 999999);
-
-    $user->update([
-        'otp_code' => $otp,
-        'otp_expires_at' => now()->addMinutes(5)
-    ]);
-
-    // 📧 EMAIL OTP
-    Mail::raw("Your OTP is: $otp", function ($message) use ($user) {
-        $message->to($user->email)
-            ->subject('CommunityLetters OTP');
-    });
-
-    // 📱 SMS OTP (Termii / Twilio etc)
-    Http::post('https://your-sms-api.com/send', [
-        'to' => $user->phone,
-        'message' => "Your OTP is $otp"
-    ]);
-
-    session(['otp_user_id' => $user->id]);
-
-    return response()->json([
-        'success' => true
-    ]);
-}
-
-    // ================= OTP VERIFY =================
+    // ================= VERIFY OTP =================
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -101,7 +93,10 @@ class ResidentController extends Controller
         $user = User::find(session('otp_user_id'));
 
         if (!$user) {
-            return redirect()->route('role')->with('error', 'Session expired');
+            return response()->json([
+                'success' => false,
+                'message' => 'Session expired'
+            ], 422);
         }
 
         if (
@@ -109,12 +104,12 @@ class ResidentController extends Controller
             now()->gt($user->otp_expires_at)
         ) {
             return response()->json([
-    'success' => false,
-    'message' => 'Invalid or expired OTP'
-], 422);
+                'success' => false,
+                'message' => 'Invalid or expired OTP'
+            ], 422);
         }
 
-        // ✅ clear
+        // clear OTP
         $user->update([
             'otp_code' => null,
             'otp_expires_at' => null
@@ -123,17 +118,19 @@ class ResidentController extends Controller
         Auth::login($user);
         session()->forget('otp_user_id');
 
-       return response()->json([
-    'success' => true,
-    'redirect' => route('resident.dashboard')
-]);
+        return response()->json([
+            'success' => true,
+            'redirect' => route('resident.dashboard')
+        ]);
     }
 
+    // ================= OTP PAGE =================
     public function otpForm()
     {
         return view('auth.otp');
     }
 
+    // ================= DASHBOARD =================
     public function dashboard()
     {
         $user = Auth::user();
