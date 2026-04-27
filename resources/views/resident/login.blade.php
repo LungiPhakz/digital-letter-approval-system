@@ -132,7 +132,7 @@ Login to Dashboard
 
 <!-- OTP MODAL -->
 <div id="otpModal"
-     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 hidden">
 
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
 
