@@ -51,7 +51,7 @@ body {
 
 <body class="bg-gradient-to-br from-purple-50 via-blue-50 to-purple-100 min-h-screen flex items-center justify-center px-6">
 
-<<div class="max-w-md w-full"> 
+<div class="max-w-md w-full"> 
     <div class="card-modern p-8"> <!-- Header --> 
         <div class="text-center mb-8"> 
     <div class="text-6xl mb-4 inline-block p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl"> 👤 </div>
@@ -104,6 +104,8 @@ Login to Dashboard
 
 </form>
 
+<!-- Back --> <div class="text-center mt-6"> <a href="{{ route('role') }}" class="text-purple-600 font-semibold hover:text-purple-700"> ← Back to Role Selection </a> </div>
+
 </div>
 
 
@@ -127,7 +129,7 @@ Login to Dashboard
 <p id="otpError" class="error-text hidden mb-3"></p>
 
 <button onclick="submitOTP()"
-class="w-full py-3 bg-purple-600 text-white rounded-lg font-bold mb-3">
+class="w-full py-3 gradient-primary text-white rounded-lg font-bold mb-3">
 Verify OTP
 </button>
 
@@ -286,12 +288,22 @@ function startTimer() {
 
 // ================= RESEND =================
 function resendOTP() {
-    fetch("/resend-otp", {
-        method: "POST",
-        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
-    });
-
-    startTimer();
+  fetch("{{ route('otp.resend') }}", {
+    method: "POST",
+    headers: {
+      "X-CSRF-TOKEN": "{{ csrf_token() }}",
+      "Accept": "application/json"
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("OTP resent successfully");
+      startTimer();
+    } else {
+      alert(data.message);
+    }
+  });
 }
 
 </script>

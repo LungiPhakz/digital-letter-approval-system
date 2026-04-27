@@ -84,46 +84,102 @@ class ResidentController extends Controller
     }
 
     // ================= VERIFY OTP =================
-    public function verifyOtp(Request $request)
-    {
-        $request->validate([
-            'otp' => 'required|digits:6'
-        ]);
+   public function verifyOtp(Request $request)
+{
+    $request->validate([
+        'otp' => 'required|digits:6'
+    ]);
 
-        $user = User::find(session('otp_user_id'));
+    $userId = session('otp_user_id');
 
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Session expired'
-            ], 422);
-        }
-
-        if (
-            $user->otp_code !== $request->otp ||
-            now()->gt($user->otp_expires_at)
-        ) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid or expired OTP'
-            ], 422);
-        }
-
-        // clear OTP
-        $user->update([
-            'otp_code' => null,
-            'otp_expires_at' => null
-        ]);
-
-        Auth::login($user);
-        session()->forget('otp_user_id');
-
+    if (!$userId) {
         return response()->json([
-            'success' => true,
-            'redirect' => route('resident.dashboard')
-        ]);
+            'success' => false,
+            'message' => 'Session expired. Please login again.'
+        ], 401);
     }
 
+    $user = User::find($userId);
+
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found'
+        ], 404);
+    }
+
+    // 🔥 FIX: FORCE STRING COMPARISON
+    $inputOtp = (string) $request->otp;
+    $savedOtp = (string) $user->otp_code;
+
+    // 🔥 FIX: expiry check
+    if (!$user->otp_expires_at || now()->greaterThan($user->otp_expires_at)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'OTP expired. Please resend OTP.'
+        ], 422);
+    }
+
+    if ($inputOtp !== $savedOtp) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid OTP'
+        ], 422);
+    }
+
+    // ✅ SUCCESS
+    $user->update([
+        'otp_code' => null,
+        'otp_expires_at' => null
+    ]);
+
+    Auth::login($user);
+    session()->forget('otp_user_id');
+
+    return response()->json([
+        'success' => true,
+        'redirect' => route('resident.dashboard')
+    ]);
+}
+
+public function resendOtp(Request $request)
+{
+    $userId = session('otp_user_id');
+
+    if (!$userId) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Session expired'
+        ], 401);
+    }
+
+    $user = User::find($userId);
+
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found'
+        ], 404);
+    }
+
+    $otp = (string) rand(100000, 999999);
+
+    $user->update([
+        'otp_code' => $otp,
+        'otp_expires_at' => now()->addMinutes(5)
+    ]);
+
+    // send email again
+    Mail::raw("CommunityLetters: Your OTP is $otp. It expires in 5 minutes.", function ($message) use ($user) {
+        $message->to($user->email)
+            ->subject('OTP Resend');
+    });
+
+    return response()->json([
+        'success' => true,
+        'message' => 'OTP resent successfully'
+    ]);
+}
     // ================= OTP PAGE =================
     public function otpForm()
     {

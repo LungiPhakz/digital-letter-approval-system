@@ -32,9 +32,8 @@ Route::post('/otp/verify', [ResidentController::class, 'verifyOtp'])
     ->name('otp.verify');
 
 // ================= OPTIONAL RESEND OTP =================
-Route::post('/otp/resend', function (Request $request) {
-    return response()->json(['success' => true]);
-})->name('otp.resend');
+Route::post('/otp/resend', [ResidentController::class, 'resendOtp'])
+    ->name('otp.resend');
 
 
 // ================= TEST MAIL =================
