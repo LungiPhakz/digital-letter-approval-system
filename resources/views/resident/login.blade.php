@@ -131,39 +131,39 @@ Login to Dashboard
 
 
 <!-- OTP MODAL -->
-<div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
+<div id="otpModal"
+     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
 
-<div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
 
-<h2 class="text-2xl font-bold mb-2">Verify OTP</h2>
-<p class="text-gray-500 mb-6">Enter the 6-digit code sent to your email</p>
+        <h2 class="text-2xl font-bold mb-2">Verify OTP</h2>
+        <p class="text-gray-500 mb-6">Enter the 6-digit code sent to your email</p>
 
-<div class="flex justify-center gap-2 mb-4">
-    <input maxlength="1" inputmode="numeric" class="otp-input" />
-    <input maxlength="1" inputmode="numeric" class="otp-input" />
-    <input maxlength="1" inputmode="numeric" class="otp-input" />
-    <input maxlength="1" inputmode="numeric" class="otp-input" />
-    <input maxlength="1" inputmode="numeric" class="otp-input" />
-    <input maxlength="1" inputmode="numeric" class="otp-input" />
+        <div class="flex justify-center gap-2 mb-4">
+            <input maxlength="1" inputmode="numeric" class="otp-input" />
+            <input maxlength="1" inputmode="numeric" class="otp-input" />
+            <input maxlength="1" inputmode="numeric" class="otp-input" />
+            <input maxlength="1" inputmode="numeric" class="otp-input" />
+            <input maxlength="1" inputmode="numeric" class="otp-input" />
+            <input maxlength="1" inputmode="numeric" class="otp-input" />
+        </div>
+
+        <p id="otpError" class="error-text hidden mb-3"></p>
+
+        <button onclick="submitOTP()"
+                class="w-full py-3 gradient-primary text-white rounded-lg font-bold mb-3">
+            Verify OTP
+        </button>
+
+        <button id="resendBtn" onclick="resendOTP()"
+                class="text-sm text-purple-600 font-semibold hidden">
+            Resend OTP
+        </button>
+
+        <p id="timerText" class="text-sm text-gray-400"></p>
+
+    </div>
 </div>
-
-<p id="otpError" class="error-text hidden mb-3"></p>
-
-<button onclick="submitOTP()"
-class="w-full py-3 gradient-primary text-white rounded-lg font-bold mb-3">
-Verify OTP
-</button>
-
-<button id="resendBtn" onclick="resendOTP()"
-class="text-sm text-purple-600 font-semibold hidden">
-Resend OTP
-</button>
-
-<p id="timerText" class="text-sm text-gray-400"></p>
-
-</div>
-</div>
-
 <script>
 
 // ================= INPUTS =================
