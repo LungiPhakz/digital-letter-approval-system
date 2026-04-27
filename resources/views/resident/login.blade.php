@@ -129,14 +129,20 @@ Login to Dashboard
 
 </div>
 
-
 <!-- OTP MODAL -->
+<!-- OTP MODAL (FIXED) -->
 <div id="otpModal"
-     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 ">
+     class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
-
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center relative z-50">
+<!-- CLOSE BUTTON (TOP RIGHT) -->
+        <button onclick="closeOtpModal()"
+                class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center
+                       text-gray-500 hover:text-red-500 text-2xl font-bold">
+            ×
+        </button>
         <h2 class="text-2xl font-bold mb-2">Verify OTP</h2>
+       
         <p class="text-gray-500 mb-6">Enter the 6-digit code sent to your email</p>
 
         <div class="flex justify-center gap-2 mb-4">
@@ -165,6 +171,16 @@ Login to Dashboard
     </div>
 </div>
 <script>
+    function closeOtpModal() {
+      document.getElementById('otpModal').classList.add('hidden');
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("otpModal");
+
+    // FORCE HIDE ON LOAD (CATCH ALL CASES)
+    modal.style.display = "none";
+});
 
 // ================= INPUTS =================
 const inputs = document.querySelectorAll(".otp-input");
@@ -371,16 +387,22 @@ function resendOTP() {
   });
 }
 function openOtpModal() {
-    document.getElementById("otpModal").classList.remove("hidden");
+    const modal = document.getElementById("otpModal");
 
-    // lock background scroll (VERY IMPORTANT FIX)
+    modal.style.display = "flex";   // FORCE SHOW
+    modal.classList.remove("hidden");
+
     document.body.style.overflow = "hidden";
 
     startTimer();
     inputs[0].focus();
 }
 function closeOtpModal() {
-    document.getElementById("otpModal").classList.add("hidden");
+    const modal = document.getElementById("otpModal");
+
+    modal.style.display = "none";
+    modal.classList.add("hidden");
+
     document.body.style.overflow = "auto";
 }
 window.addEventListener("resize", () => {

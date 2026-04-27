@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class ResidentController extends Controller
 {
@@ -60,7 +61,7 @@ class ResidentController extends Controller
         }
 
         // ================= OTP =================
-        $otp = rand(100000, 999999);
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         $user->update([
             'otp_code' => $otp,
@@ -100,6 +101,12 @@ class ResidentController extends Controller
     }
 
     $user = User::find($userId);
+    // 🔥 DEBUG OTP (ADD HERE TEMPORARILY)
+\Log::info('OTP DEBUG', [
+    'otp' => $user->otp_code,
+    'expires_at' => $user->otp_expires_at,
+    'now' => now()
+]);
 
     if (!$user) {
         return response()->json([
@@ -108,11 +115,7 @@ class ResidentController extends Controller
         ], 404);
     }
 
-    // 🔥 FIX: FORCE STRING COMPARISON
-    $inputOtp = (string) $request->otp;
-    $savedOtp = (string) $user->otp_code;
-
-    // 🔥 FIX: expiry check
+    // ✅ FIX 1: CHECK EXPIRY FIRST (MOST IMPORTANT)
     if (!$user->otp_expires_at || now()->greaterThan($user->otp_expires_at)) {
         return response()->json([
             'success' => false,
@@ -120,7 +123,8 @@ class ResidentController extends Controller
         ], 422);
     }
 
-    if ($inputOtp !== $savedOtp) {
+    // ✅ FIX 2: CHECK OTP
+    if ((string) $request->otp !== (string) $user->otp_code) {
         return response()->json([
             'success' => false,
             'message' => 'Invalid OTP'
@@ -187,17 +191,18 @@ public function resendOtp(Request $request)
     }
 
     // ================= DASHBOARD =================
-    public function dashboard()
-    {
-        $user = Auth::user();
+   public function dashboard()
+{
+    $user = Auth::user();
 
-        $requests = LetterRequest::with('user')
-            ->where('user_id', $user->id)
-            ->latest()
-            ->get();
+    $allRequests = LetterRequest::with('user')
+        ->where('user_id', $user->id)
+        ->latest()
+        ->get();
 
-        return view('resident.dashboard', compact('user', 'requests'));
-    }
+    return view('resident.dashboard', compact('user', 'allRequests'));
+}
+    
 
     // ================= PHONE FORMAT =================
     private function formatPhone($phone)

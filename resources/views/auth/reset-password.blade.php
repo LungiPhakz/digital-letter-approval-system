@@ -1,39 +1,124 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
-        @csrf
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+<title>Reset Password - CommunityLetters</title>
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+<script src="https://cdn.tailwindcss.com"></script>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+}
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+.gradient-primary {
+    background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+}
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
+.card-modern {
+    background:white;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    transition:0.3s;
+}
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+.card-modern:hover {
+    transform:translateY(-4px);
+    box-shadow:0 15px 40px rgba(0,0,0,.12);
+}
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+.input-field {
+    width:100%;
+    padding:12px;
+    border:2px solid #e5e7eb;
+    border-radius:10px;
+    outline:none;
+    transition:0.2s;
+}
+
+.input-field:focus {
+    border-color:#7c3aed;
+}
+</style>
+
+</head>
+
+<body class="bg-gradient-to-br from-purple-50 via-blue-50 to-purple-100 min-h-screen flex items-center justify-center px-6">
+
+<div class="max-w-md w-full">
+
+<div class="card-modern p-8">
+
+<!-- HEADER -->
+<div class="text-center mb-6">
+
+<div class="text-5xl mb-4 inline-block p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl">
+🔐
+</div>
+
+<h1 class="text-2xl font-bold text-gray-800">
+Reset Your Password
+</h1>
+
+<p class="text-gray-500 text-sm mt-1">
+Create a new secure password for your account
+</p>
+
+</div>
+
+<!-- ERRORS -->
+@if ($errors->any())
+<div class="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm">
+    {{ $errors->first() }}
+</div>
+@endif
+
+<!-- SUCCESS -->
+@if (session('status'))
+<div class="mb-4 p-3 bg-green-100 text-green-700 rounded text-sm">
+    {{ session('status') }}
+</div>
+@endif
+
+<!-- FORM -->
+<form method="POST" action="{{ route('password.update') }}">
+@csrf
+
+<input type="hidden" name="token" value="{{ request()->route('token') }}">
+
+<input type="hidden" name="email" value="{{ request('email') }}">
+
+<!-- PASSWORD -->
+<div class="mb-4">
+<label class="text-sm text-gray-600">New Password</label>
+<input type="password" name="password" required class="input-field mt-1">
+</div>
+
+<!-- CONFIRM -->
+<div class="mb-6">
+<label class="text-sm text-gray-600">Confirm Password</label>
+<input type="password" name="password_confirmation" required class="input-field mt-1">
+</div>
+
+<button type="submit"
+class="w-full py-3 gradient-primary text-white rounded-lg font-bold">
+Update Password
+</button>
+
+</form>
+
+<!-- BACK -->
+<div class="text-center mt-6">
+<a href="{{ route('councilor.login') }}" class="text-purple-600 font-semibold hover:text-purple-700">
+← Back to Login
+</a>
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

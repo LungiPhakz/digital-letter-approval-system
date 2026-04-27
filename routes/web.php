@@ -9,6 +9,10 @@ use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CouncilorController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use Illuminate\Support\Facades\Password;
+ use App\Http\Controllers\PageController;
 
 // ================= HOME =================
 Route::get('/', fn() => view('home'))->name('home');
@@ -36,16 +40,23 @@ Route::post('/otp/resend', [ResidentController::class, 'resendOtp'])
     ->name('otp.resend');
 
 
-// ================= TEST MAIL =================
-Route::get('/test-mail', function () {
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->name('password.request');
 
-    Mail::raw('Hello OTP Test', function ($message) {
-        $message->to('yourgmail@gmail.com')
-                ->subject('Test Email');
-    });
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+    ->name('password.email');
 
-    return 'Email sent';
-});
+
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
+    ->name('password.update');
+
+
+Route::get('/reset-password/{token}', function ($token) {
+    return view('auth.reset-password', ['token' => $token]);
+})->name('password.reset');
+
+
 
 
 // ================= AUTH PROTECTED =================
@@ -107,6 +118,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/admin/reject/{id}', [AdminController::class, 'reject'])
             ->name('admin.reject');
     });
+
+    
+  
+
+Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
+Route::get('/terms-of-service', [PageController::class, 'terms'])->name('terms');
+Route::get('/security', [PageController::class, 'security'])->name('security');
 
     // ================= LOGOUT =================
     Route::post('/logout', function (Request $request) {

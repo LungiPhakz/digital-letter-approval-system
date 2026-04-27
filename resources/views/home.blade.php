@@ -585,9 +585,9 @@ Get Started
 <div>
   <h4 class="font-semibold text-white mb-4">Legal</h4>
   <ul class="space-y-2 text-sm">
-    <li><button onclick="scrollToContact()" class="hover:text-white transition">Privacy Policy</button></li>
-    <li><button onclick="scrollToContact()" class="hover:text-white transition">Terms of Service</button></li>
-    <li><button onclick="scrollToContact()" class="hover:text-white transition">Security</button></li>
+    <li><a href="{{ route('privacy') }}" class="hover:text-white transition">Privacy Policy</a></li>
+<li><a href="{{ route('terms') }}" class="hover:text-white transition">Terms of Service</a></li>
+<li><a href="{{ route('security') }}" class="hover:text-white transition">Security</a></li>
   </ul>
 </div>
       </div>

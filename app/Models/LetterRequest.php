@@ -13,7 +13,7 @@ class LetterRequest extends Model
     'letter_type',
     'purpose_type',
     'address',
-   
+     'rejection_reason',
     'latitude',
     'longitude',
     'status',

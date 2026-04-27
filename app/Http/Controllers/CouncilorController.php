@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\LetterRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RequestApprovedMail;
+use App\Mail\RequestRejectedMail;
 
 class CouncilorController extends Controller
 {
@@ -76,21 +79,31 @@ class CouncilorController extends Controller
             'approved_at' => now(),
         ]);
 
+        Mail::to($request->user->email)
+        ->send(new RequestApprovedMail($request));
+
         return response()->json(['success' => true]);
     }
 
     // ================= REJECT =================
-    public function reject(Request $req, $id)
-    {
-         $request = LetterRequest::findOrFail($id);
+   public function reject(Request $req, $id)
+{
+    $request = LetterRequest::findOrFail($id);
 
-        $request->update([
-            'status' => 'Rejected',
-            'rejection_reason' => $req->reason
-        ]);
+    // ✅ define reason properly
+    $reason = $req->input('reason');
 
-        return response()->json(['success' => true]);
-    }
+    $request->update([
+        'status' => 'Rejected',
+        'rejection_reason' => $reason
+    ]);
+
+    // ✅ now it works
+    Mail::to($request->user->email)
+        ->send(new RequestRejectedMail($request, $reason));
+
+    return response()->json(['success' => true]);
+}
 
     // ================= APPROVE WITH SIGNATURE + STAMP =================
  // ================= APPROVE WITH SIGNATURE + STAMP =================

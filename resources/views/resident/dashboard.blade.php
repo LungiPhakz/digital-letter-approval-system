@@ -89,13 +89,13 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
 
       <div class="card-modern p-8 text-center border-t-4 border-yellow-500">
         <div class="text-5xl mb-4">⏱️</div>
-        <h3 class="text-xl font-bold text-gray-800" id="resident-pending-count">{{ $requests->where('status','Pending')->count() }}</h3>
+        <h3 class="text-xl font-bold text-gray-800" id="resident-pending-count">{{ $allRequests->where('status','Pending')->count() }}</h3>
         <p class="text-gray-600 mt-2">Pending Requests</p>
       </div>
 
       <div class="card-modern p-8 text-center border-t-4 border-green-500">
         <div class="text-5xl mb-4">✅</div>
-        <h3 class="text-xl font-bold text-gray-800" id="resident-completed-count">{{ $requests->where('status','Approved')->count() }}</h3>
+        <h3 class="text-xl font-bold text-gray-800" id="resident-completed-count">{{ $allRequests->where('status','Approved')->count() }}</h3>
         <p class="text-gray-600 mt-2">Completed Requests</p>
       </div>
     </div>
@@ -125,7 +125,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
       <!-- ✅ ONLY ONE TBODY -->
       <tbody>
 
-        @if($requests->isEmpty())
+        @if($allRequests->isEmpty())
         <tr>
           <td colspan="5" class="px-6 py-8 text-center text-gray-500">
             No requests yet. Click "New Request" to get started!
@@ -133,7 +133,7 @@ html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe U
         </tr>
         @else
 
-        @foreach($requests as $request)
+        @foreach($allRequests as $request)
         <tr class="border-b hover:bg-gray-50">
 
           <td class="px-6 py-4 font-semibold">
