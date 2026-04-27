@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <title>CommunityLetters - Resident Login</title>
 
@@ -13,6 +14,11 @@
 
 body {
     font-family: 'Inter', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden; /* prevents scroll jump */
 }
 
 .gradient-primary {
@@ -38,6 +44,21 @@ body {
 .otp-input:focus {
     border-color: #7c3aed;
     outline: none;
+}
+
+/* FIX modal stability on mobile keyboards */
+#otpModal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+/* prevent zoom/shift issues on input focus */
+input, textarea {
+    font-size: 16px;
 }
 
 /* 🔥 PROFESSIONAL ERROR STYLE */
@@ -305,7 +326,26 @@ function resendOTP() {
     }
   });
 }
+function openOtpModal() {
+    document.getElementById("otpModal").classList.remove("hidden");
 
+    // lock background scroll (VERY IMPORTANT FIX)
+    document.body.style.overflow = "hidden";
+
+    startTimer();
+    inputs[0].focus();
+}
+function closeOtpModal() {
+    document.getElementById("otpModal").classList.add("hidden");
+    document.body.style.overflow = "auto";
+}
+window.addEventListener("resize", () => {
+    const modal = document.getElementById("otpModal");
+
+    if (!modal.classList.contains("hidden")) {
+        modal.scrollTop = 0;
+    }
+});
 </script>
 
 </body>
