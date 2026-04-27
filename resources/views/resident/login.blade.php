@@ -131,7 +131,7 @@ Login to Dashboard
 
 
 <!-- OTP MODAL -->
-<div id="otpModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+<div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
 
 <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
 
@@ -139,12 +139,12 @@ Login to Dashboard
 <p class="text-gray-500 mb-6">Enter the 6-digit code sent to your email</p>
 
 <div class="flex justify-center gap-2 mb-4">
-<input maxlength="1" class="otp-input" />
-<input maxlength="1" class="otp-input" />
-<input maxlength="1" class="otp-input" />
-<input maxlength="1" class="otp-input" />
-<input maxlength="1" class="otp-input" />
-<input maxlength="1" class="otp-input" />
+    <input maxlength="1" inputmode="numeric" class="otp-input" />
+    <input maxlength="1" inputmode="numeric" class="otp-input" />
+    <input maxlength="1" inputmode="numeric" class="otp-input" />
+    <input maxlength="1" inputmode="numeric" class="otp-input" />
+    <input maxlength="1" inputmode="numeric" class="otp-input" />
+    <input maxlength="1" inputmode="numeric" class="otp-input" />
 </div>
 
 <p id="otpError" class="error-text hidden mb-3"></p>
@@ -169,20 +169,72 @@ Resend OTP
 // ================= INPUTS =================
 const inputs = document.querySelectorAll(".otp-input");
 
-// OTP move
+// ================= AUTO FOCUS + INPUT =================
 inputs.forEach((input, index) => {
-    input.addEventListener("input", () => {
-        if (input.value && index < inputs.length - 1) {
+
+    // TYPE / AUTO MOVE
+    input.addEventListener("input", (e) => {
+        const value = e.target.value;
+
+        // allow only numbers
+        e.target.value = value.replace(/\D/g, '');
+
+        if (value && index < inputs.length - 1) {
             inputs[index + 1].focus();
+        }
+
+        // AUTO SUBMIT WHEN COMPLETE
+        if (index === inputs.length - 1) {
+            const otp = getOTP();
+            if (otp.length === 6) {
+                submitOTP();
+            }
         }
     });
 
+    // BACKSPACE BEHAVIOR (WhatsApp style)
     input.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && !input.value && index > 0) {
-            inputs[index - 1].focus();
+        if (e.key === "Backspace") {
+
+            if (input.value === "" && index > 0) {
+                inputs[index - 1].focus();
+                inputs[index - 1].value = "";
+            }
+        }
+    });
+
+    // PASTE SUPPORT (VERY IMPORTANT)
+    input.addEventListener("paste", (e) => {
+        e.preventDefault();
+
+        const paste = (e.clipboardData || window.clipboardData)
+            .getData("text")
+            .replace(/\D/g, '')
+            .slice(0, 6);
+
+        paste.split("").forEach((char, i) => {
+            if (inputs[i]) {
+                inputs[i].value = char;
+            }
+        });
+
+        const lastIndex = paste.length - 1;
+        if (inputs[lastIndex]) {
+            inputs[lastIndex].focus();
+        }
+
+        if (paste.length === 6) {
+            submitOTP();
         }
     });
 });
+
+// ================= GET OTP =================
+function getOTP() {
+    let otp = "";
+    inputs.forEach(i => otp += i.value);
+    return otp;
+}
 
 // ================= LOGIN =================
 document.getElementById("loginForm").addEventListener("submit", async function(e) {
@@ -204,17 +256,15 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
     const data = await res.json();
 
     if (!res.ok) {
-
-        // show backend validation errors properly
         if (data.errors) {
             showFieldErrors(data.errors);
         } else {
             alert(data.message || "Login failed");
         }
-
         return;
     }
 
+    // ONLY open modal (DO NOT hide login manually)
     openOtpModal();
 });
 
@@ -240,17 +290,11 @@ function clearErrors() {
     });
 }
 
-// ================= OTP =================
-function openOtpModal() {
-    document.getElementById("otpModal").classList.remove("hidden");
-    startTimer();
-    inputs[0].focus();
-}
+
 
 function submitOTP() {
 
-    let otp = "";
-    inputs.forEach(i => otp += i.value);
+    const otp = getOTP();
 
     if (otp.length !== 6) {
         showOTPError("Enter complete OTP");
@@ -343,7 +387,7 @@ window.addEventListener("resize", () => {
     const modal = document.getElementById("otpModal");
 
     if (!modal.classList.contains("hidden")) {
-        modal.scrollTop = 0;
+        modal.scrollIntoView({ block: "center" });
     }
 });
 </script>
