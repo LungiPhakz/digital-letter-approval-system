@@ -37,6 +37,8 @@ return [
 
     'mailers' => [
 
+        
+
         'smtp' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
@@ -70,6 +72,10 @@ return [
             'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
         ],
 
+        'brevo' => [
+    'transport' => 'brevo',
+],
+
         'log' => [
             'transport' => 'log',
             'channel' => env('MAIL_LOG_CHANNEL'),
@@ -99,6 +105,8 @@ return [
 
     ],
 
+
+    
     /*
     |--------------------------------------------------------------------------
     | Global "From" Address
