@@ -490,7 +490,7 @@ Get Started
       <div class="grid md:grid-cols-4 gap-8 text-center">
         <div class="animate-fade-in" style="animation-delay: 0.3s;">
         <div class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-         &lt;Secure
+         Secure
         </div>
         <p class="text-gray-600 mt-2">Data Protection</p>
        </div>

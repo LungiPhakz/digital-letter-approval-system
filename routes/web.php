@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\Password;
 // ================= HOME =================
 Route::get('/', fn() => view('home'))->name('home');
 
+
+Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
+Route::get('/terms-of-service', [PageController::class, 'terms'])->name('terms');
+Route::get('/security', [PageController::class, 'security'])->name('security');
+
 // ================= ROLE =================
 Route::get('/role', [ResidentController::class, 'roleSelection'])->name('role');
 
@@ -122,9 +127,6 @@ Route::middleware(['auth'])->group(function () {
     
   
 
-Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
-Route::get('/terms-of-service', [PageController::class, 'terms'])->name('terms');
-Route::get('/security', [PageController::class, 'security'])->name('security');
 
     // ================= LOGOUT =================
     Route::post('/logout', function (Request $request) {
