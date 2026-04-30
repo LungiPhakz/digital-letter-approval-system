@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 
 use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\RequestController;
@@ -11,60 +10,57 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CouncilorController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-use Illuminate\Support\Facades\Password;
- use App\Http\Controllers\PageController;
+use App\Http\Controllers\PageController;
 
-// ================= HOME =================
+/*
+|--------------------------------------------------------------------------
+| PUBLIC ROUTES
+|--------------------------------------------------------------------------
+*/
+
+// HOME
 Route::get('/', fn() => view('home'))->name('home');
 
-
+// STATIC PAGES
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/terms-of-service', [PageController::class, 'terms'])->name('terms');
 Route::get('/security', [PageController::class, 'security'])->name('security');
 
-// ================= ROLE =================
+// ROLE SELECTION
 Route::get('/role', [ResidentController::class, 'roleSelection'])->name('role');
 
-// ================= LOGIN PAGES =================
+// LOGIN PAGES
 Route::view('/resident/login', 'resident.login')->name('resident.login');
 Route::view('/councilor/login', 'councilor.login')->name('councilor.login');
 
-// ================= LOGIN (AJAX JSON) =================
-Route::post('/resident/login', [ResidentController::class, 'login'])
-    ->name('resident.login.post');
+// LOGIN ACTIONS
+Route::post('/resident/login', [ResidentController::class, 'login'])->name('resident.login.post');
+Route::post('/councilor/login', [CouncilorController::class, 'login'])->name('councilor.login.post');
 
-Route::post('/councilor/login', [CouncilorController::class, 'login'])
-    ->name('councilor.login.post');
+// OTP
+Route::post('/otp/verify', [ResidentController::class, 'verifyOtp'])->name('otp.verify');
+Route::post('/otp/resend', [ResidentController::class, 'resendOtp'])->name('otp.resend');
 
-// ================= OTP =================
-Route::post('/otp/verify', [ResidentController::class, 'verifyOtp'])
-    ->name('otp.verify');
-
-// ================= OPTIONAL RESEND OTP =================
-Route::post('/otp/resend', [ResidentController::class, 'resendOtp'])
-    ->name('otp.resend');
-
-
-Route::get('/forgot-password', function () {
-    return view('auth.forgot-password');
-})->name('password.request');
+// PASSWORD RESET
+Route::get('/forgot-password', fn() => view('auth.forgot-password'))->name('password.request');
 
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])
     ->name('password.email');
 
+Route::get('/reset-password/{token}', fn($token) =>
+    view('auth.reset-password', ['token' => $token])
+)->name('password.reset');
 
-    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
     ->name('password.update');
 
 
-Route::get('/reset-password/{token}', function ($token) {
-    return view('auth.reset-password', ['token' => $token]);
-})->name('password.reset');
+/*
+|--------------------------------------------------------------------------
+| AUTHENTICATED ROUTES
+|--------------------------------------------------------------------------
+*/
 
-
-
-
-// ================= AUTH PROTECTED =================
 Route::middleware(['auth'])->group(function () {
 
     // ================= RESIDENT =================
@@ -83,8 +79,9 @@ Route::middleware(['auth'])->group(function () {
             ->name('resident.request.cancel');
     });
 
-    // ================= COUNCILOR + ADMIN =================
-    Route::middleware('role:councilor,admin')->group(function () {
+
+    // ================= COUNCILOR + ADMIN + DEMO =================
+    Route::middleware('role:councilor,admin,demo')->group(function () {
 
         Route::get('/councilor/dashboard', [CouncilorController::class, 'dashboard'])
             ->name('councilor.dashboard');
@@ -108,7 +105,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('councilor.request.delete');
     });
 
-    // ================= ADMIN =================
+
+    // ================= ADMIN ONLY =================
     Route::middleware('role:admin')->group(function () {
 
         Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
@@ -124,15 +122,11 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.reject');
     });
 
-    
-  
-
 
     // ================= LOGOUT =================
     Route::post('/logout', function (Request $request) {
 
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

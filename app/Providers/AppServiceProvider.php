@@ -39,14 +39,26 @@ class AppServiceProvider extends ServiceProvider
 
     // ✅ Create admin user if not exists
     try {
-        if (!User::where('email', 'lungiphakz12@gmail.com')->exists()) {
+        // ✅ Councilor account
+        if (!User::where('email', 'councilor@gmail.com')->exists()) {
             User::create([
                 'name' => 'Bongiwe Phakathi',
-                'email' => 'lungiphakz12@gmail.com',
-                'password' => Hash::make('password123'),
-                'role' => 'councilor', // ✅ correct role
+                'email' => 'councilor@gmail.com',
+                'password' => Hash::make('password'),
+                'role' => 'councilor',
             ]);
         }
+
+        // ✅ Demo Admin account (SAFE DEMO)
+        if (!User::where('email', 'admin-demo@communityletters.xyz')->exists()) {
+            User::create([
+                'name' => 'Demo Admin',
+                'email' => 'admin-demo@communityletters.xyz',
+                'password' => Hash::make('demo123'),
+                'role' => 'demo', // 🔥 THIS is important
+            ]);
+        }
+
     } catch (\Exception $e) {
         // Prevent crash if DB not ready yet
     }

@@ -479,6 +479,8 @@ if ($completed->count() > 0) {
             </td>
 
             <td class="border p-2">
+               @if(auth()->user()->role !== 'demo')
+        <!-- REAL USER -->
                 <button onclick="openApprovalModal({{ $request->id }})"
     class="px-2 py-1 bg-green-500 text-white rounded">
     Approve
@@ -488,6 +490,21 @@ if ($completed->count() > 0) {
                     @csrf
                     <button class="px-2 py-1 bg-red-500 text-white rounded">Reject</button>
                 </form>
+
+                @else
+        <!-- DEMO USER -->
+        <button disabled
+            class="px-2 py-1 bg-gray-400 text-white rounded cursor-not-allowed"
+            onclick="alert('⚠️emo users cannot approve requests')">
+            Approve
+        </button>
+
+        <button disabled
+            class="px-2 py-1 bg-gray-400 text-white rounded cursor-not-allowed"
+            onclick="alert('⚠️Demo users cannot reject requests')">
+            Reject
+        </button>
+    @endif
             </td>
         </tr>
     @empty
@@ -598,11 +615,15 @@ if ($completed->count() > 0) {
         <div>
   <p class="text-sm text-gray-600">Account Settings</p>
 
+  
+
   <button 
     onclick="openAccountModal()"
     class="mt-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition">
     Update Email / Password
   </button>
+
+ 
 </div>
        </div>
       </div><!-- Statistics Summary -->
@@ -779,10 +800,20 @@ if ($completed->count() > 0) {
           Cancel
         </button>
 
-        <button onclick="finalizeApprovalWithSignature()"
-          class="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg font-bold hover:shadow-lg transition transform hover:scale-105">
-          ✓ Sign & Approve
-        </button>
+        @if(auth()->user()->role === 'demo')
+    <button
+        disabled
+        
+        class="flex-1 px-6 py-3 bg-gray-400 text-white rounded-lg font-bold cursor-not-allowed opacity-70"
+        onclick="alert('⚠️ Demo users cannot perform this action')">
+        ✓ Sign & Approve 
+    </button>
+@else
+    <button onclick="finalizeApprovalWithSignature()"
+        class="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg font-bold hover:shadow-lg transition transform hover:scale-105">
+        ✓ Sign & Approve
+    </button>
+@endif
       </div>
 
     </div>
@@ -887,10 +918,23 @@ if ($completed->count() > 0) {
             Cancel
           </button>
 
+          @if(auth()->user()->role !== 'demo')
+
           <button type="submit"
             class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg">
             Update
           </button>
+
+          @else
+
+  <button 
+    disabled
+    title="Demo users cannot change account settings"
+    class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg">
+    Update
+  </button>
+
+@endif
         </div>
 
       </form>
@@ -1498,13 +1542,19 @@ if (request.status === 'Approved') {
             ${days}
         </td>
         <td class="px-6 py-4">
-
+@if(auth()->user()->role !== 'demo')
     <button 
         type="button"
         onclick="openDeleteConfirm({{ $request->id }})"
         class="text-red-600 font-semibold hover:underline">
         Delete
     </button>
+
+    @else
+    <button class="delete-btn" onclick="alert('Demo users cannot perform this action')">
+        Delete
+    </button>
+@endif
 
 </td>
       </tr>

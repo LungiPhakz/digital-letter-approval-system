@@ -41,6 +41,9 @@ background:white;
 border-radius:20px;
 box-shadow:0 10px 30px rgba(0,0,0,.08);
 transition:0.3s;
+
+       /* prevents it from becoming too tall */
+ 
 }
 
 .card-modern:hover{
@@ -71,7 +74,7 @@ box-shadow:0 15px 40px rgba(0,0,0,.12);
 
 <div class="max-w-md w-full">
 
-<div class="card-modern p-8">
+<div class="card-modern p-6">
 
 <!-- Header -->
 
@@ -108,7 +111,7 @@ type="email"
 name="email"
 placeholder="Councilor Email"
 required
-class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:border-purple-500"
+class="w-full mb-3 p-3 border rounded-lg focus:outline-none focus:border-purple-500"
 />
 
 <input
@@ -116,8 +119,15 @@ type="password"
 name="password"
 placeholder="Password"
 required
-class="w-full mb-6 p-3 border rounded-lg focus:outline-none focus:border-purple-500"
+class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:border-purple-500"
 />
+
+<!--DEMO BOX (CLEAN UI) -->
+<div class="text-sm bg-blue-50 border border-blue-200 text-blue-700 p-2 rounded-lg mb-3">
+    <strong>Demo Access:</strong><br>
+    Email: admin-demo@communityletters.xyz <br>
+    Password: demo123
+</div>
 
 <div class="text-right mb-4">
     <button type="button"

@@ -29,7 +29,7 @@ class CouncilorController extends Controller
         session()->regenerate();
 
         // 🔒 Role check
-        if (!in_array($user->role, ['councilor', 'admin'])) {
+        if (!in_array($user->role, ['councilor', 'admin', 'demo'])) {
             Auth::logout();
 
             return back()->with('error', 'Access denied.');
@@ -170,12 +170,17 @@ public function logout(Request $request)
 
 public function destroy($id)
 {
-   $request = LetterRequest::findOrFail($id);
+    // 🚫 Block demo users
+    if (auth()->user()->role === 'demo') {
+        return back()->with('error', 'Demo users cannot perform this action');
+    }
+
+    // ✅ Normal delete logic
+    $request = LetterRequest::findOrFail($id);
     $request->delete();
 
     return back()->with('success', 'Request deleted successfully');
 }
-
     public function send($id)
     {
         $request = LetterRequest::findOrFail($id);
